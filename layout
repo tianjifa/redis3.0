@@ -1,2 +1,20 @@
-cli
-  ->
+redis-cli
+	->cliInitHelp()初始化/解析命令
+      helpEntries获取值
+  ->parseOptions()User 处理命令，调用对应的函数
+  ->cliConnect()连接服务器
+    ->redisFree()
+    ->redisConnect()/redisConnectUnix()
+    ->anetKeepAlive()
+    ->cliAuth()
+    ->cliSelect()
+  ->repl()
+    ->linenoiseSetMultiLine()
+    ->linenoiseSetCompletionCallback()
+    ....
+    ->cliRefreshPrompt()
+    ->linenoise()
+    ...
+    ->sdsfreesplitres()  释放参数向量
+  ->noninteractive()
+    ->cliSendCommand()
