@@ -40,7 +40,7 @@
 #include <stdarg.h>
 
 /*
- * 类型别名，用于指向 sdshdr 的 buf 属性
+ * 类型别名，用于指向 sdshdr 的 buf 属性，即将char*起个别名shs
  */
 typedef char *sds;
 
@@ -79,35 +79,35 @@ static inline size_t sdsavail(const sds s) {
     return sh->free;
 }
 
-sds sdsnewlen(const void *init, size_t initlen);
-sds sdsnew(const char *init);
-sds sdsempty(void);
+sds sdsnewlen(const void *init, size_t initlen);//创建一个指定长度的sds，接受一个指定的C字符串作为初始化值
+sds sdsnew(const char *init);//根据给定的C字符串，创建一个相应的sds
+sds sdsempty(void);//创建一个只包含空字符串””的sds
 size_t sdslen(const sds s);
-sds sdsdup(const sds s);
-void sdsfree(sds s);
+sds sdsdup(const sds s);//复制给定的sds
+void sdsfree(sds s);//释放给定的sds
 size_t sdsavail(const sds s);
-sds sdsgrowzero(sds s, size_t len);
-sds sdscatlen(sds s, const void *t, size_t len);
+sds sdsgrowzero(sds s, size_t len);//将给定的sds扩展到指定的长度，空余的部分用\0进行填充
+sds sdscatlen(sds s, const void *t, size_t len);//将一个C字符串追加到给定的sds对应sdshdr的buf
 sds sdscat(sds s, const char *t);
 sds sdscatsds(sds s, const sds t);
-sds sdscpylen(sds s, const char *t, size_t len);
+sds sdscpylen(sds s, const char *t, size_t len);//将一个C字符串复制到sds中，需要依据sds的总长度来判断是否需要扩展
 sds sdscpy(sds s, const char *t);
 
 sds sdscatvprintf(sds s, const char *fmt, va_list ap);
 #ifdef __GNUC__
-sds sdscatprintf(sds s, const char *fmt, ...)
+sds sdscatprintf(sds s, const char *fmt, ...)//通过格式化输出形式，来追加到给定的sds
     __attribute__((format(printf, 2, 3)));
 #else
 sds sdscatprintf(sds s, const char *fmt, ...);
 #endif
 
 sds sdscatfmt(sds s, char const *fmt, ...);
-sds sdstrim(sds s, const char *cset);
-void sdsrange(sds s, int start, int end);
+sds sdstrim(sds s, const char *cset);//对给定sds，删除前端/后端在给定的C字符串中的字符
+void sdsrange(sds s, int start, int end);//截取给定sds，[start,end]字符串
 void sdsupdatelen(sds s);
-void sdsclear(sds s);
-int sdscmp(const sds s1, const sds s2);
-sds *sdssplitlen(const char *s, int len, const char *sep, int seplen, int *count);
+void sdsclear(sds s);//清除给定sds的buf，将buf初始化为””，同时修改对应sdshdr的free与len值
+int sdscmp(const sds s1, const sds s2);//比较两个sds的大小
+sds *sdssplitlen(const char *s, int len, const char *sep, int seplen, int *count);//对给定的字符串s按照给定的sep分隔字符串来进行切割
 void sdsfreesplitres(sds *tokens, int count);
 void sdstolower(sds s);
 void sdstoupper(sds s);
@@ -118,9 +118,9 @@ sds sdsmapchars(sds s, const char *from, const char *to, size_t setlen);
 sds sdsjoin(char **argv, int argc, char *sep);
 
 /* Low level functions exposed to the user API */
-sds sdsMakeRoomFor(sds s, size_t addlen);
-void sdsIncrLen(sds s, int incr);
-sds sdsRemoveFreeSpace(sds s);
-size_t sdsAllocSize(sds s);
+sds sdsMakeRoomFor(sds s, size_t addlen);//对给定sds对应sdshdr的buf进行扩展
+void sdsIncrLen(sds s, int incr);//对给定sds的buf的右端进行扩展或缩小
+sds sdsRemoveFreeSpace(sds s);//在不改动sds的前提下，将buf的多余空间释放
+size_t sdsAllocSize(sds s);//计算给定的sds所占的内存大小
 
 #endif
