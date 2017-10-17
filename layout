@@ -1,29 +1,102 @@
-redis-cli
-	->cliInitHelp()初始化/解析命令
-      helpEntries获取值
-  ->parseOptions()User 处理命令，调用对应的函数
-    ->...
-  ->cliConnect()连接服务器
-    ->redisFree()
-    ->redisConnect()/redisConnectUnix()
-    ->anetKeepAlive()
-    ->cliAuth()
-    ->cliSelect()
-  ->repl()
-    ->linenoiseSetMultiLine()
-    ->linenoiseSetCompletionCallback()
-    ....
-    ->cliRefreshPrompt()
-    ->linenoise()
-    ...
-    ->sdsfreesplitres()  释放参数向量
-  ->noninteractive()
-    ->cliSendCommand()
-      ->...
----------------------------------------------------------------------------
+Server:
 redis-server
----------------------------------------------------------------------------
-shs.h/shs.c
+	adlist.o 双端链表实现
+	ae.o 
+	anet.o 
+	dict.o 字典实现
+	redis.o 
+	sds.o 动态字符串实现
+	zmalloc.o 
+	lzf_c.o 
+	lzf_d.o 
+	pqsort.o 
+	zipmap.o 
+	sha1.o 
+	ziplist.o 跳跃表实现
+	release.o 
+	networking.o 
+	util.o 
+	object.o 
+	db.o 
+	replication.o 
+	rdb.o 
+	t_string.o 
+	t_list.o 
+	t_set.o 
+	t_zset.o 
+	t_hash.o 
+	config.o 
+	aof.o 
+	pubsub.o 
+	multi.o 
+	debug.o 
+	sort.o 
+	intset.o 
+	syncio.o 
+	cluster.o 
+	crc16.o 
+	endianconv.o 
+	slowlog.o 
+	scripting.o 
+	bio.o rio.o 
+	rand.o 
+	memtest.o 
+	crc64.o 
+	bitops.o 
+	sentinel.o 
+	notify.o 
+	setproctitle.o 
+	blocked.o 
+	hyperloglog.o
+------------------------------------------
+Client:
+	anet.o 
+	sds.o 动态字符串实现
+	adlist.o 双端链表实现
+	redis-cli.o
+		cliInitHelp()初始化/解析命令
+			helpEntries获取值
+		parseOptions()User 处理命令，调用对应的函数
+		->...
+		cliConnect()连接服务器
+			redisFree()
+		redisConnect()/redisConnectUnix()
+		anetKeepAlive()
+		cliAuth()
+		cliSelect()
+		repl()
+		linenoiseSetMultiLine()
+		linenoiseSetCompletionCallback()
+		....
+		cliRefreshPrompt()
+		linenoise()
+		...
+		sdsfreesplitres()  释放参数向量
+		noninteractive()
+			cliSendCommand()
+	zmalloc.o 
+	release.o 
+	anet.o 
+	ae.o 
+	crc64.o
+-------------------------------------------
+redis-benchmark
+	ae.o 
+	anet.o 
+	redis-benchmark.o 
+	sds.o 动态字符串实现
+	adlist.o 双端链表实现
+	zmalloc.o 
+	redis-benchmark.o
+-------------------------------------------
+redis-check-dump
+	redis-check-dump.o 
+	lzf_c.o 
+	lzf_d.o 
+	crc64.o
+-------------------------------------------
+redis-check-aof
+	redis-check-aof.o
 
 
 
