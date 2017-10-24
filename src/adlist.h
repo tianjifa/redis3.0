@@ -128,21 +128,21 @@ typedef struct list {
 #define listGetMatchMethod(l) ((l)->match)
 
 /* Prototypes */
-list *listCreate(void);
-void listRelease(list *list);
-list *listAddNodeHead(list *list, void *value);
-list *listAddNodeTail(list *list, void *value);
-list *listInsertNode(list *list, listNode *old_node, void *value, int after);
-void listDelNode(list *list, listNode *node);
-listIter *listGetIterator(list *list, int direction);
-listNode *listNext(listIter *iter);
-void listReleaseIterator(listIter *iter);
-list *listDup(list *orig);
-listNode *listSearchKey(list *list, void *key);
-listNode *listIndex(list *list, long index);
-void listRewind(list *list, listIter *li);
-void listRewindTail(list *list, listIter *li);
-void listRotate(list *list);
+list *listCreate(void);//创建一个新的链表
+void listRelease(list *list);//释放整个链表，以及链表中所有节点
+list *listAddNodeHead(list *list, void *value);//将一个包含有给定值指针 value 的新节点添加到链表的表头
+list *listAddNodeTail(list *list, void *value);//将一个包含有给定值指针 value 的新节点添加到链表的表尾
+list *listInsertNode(list *list, listNode *old_node, void *value, int after);//创建一个包含值 value 的新节点，并将它插入到 old_node 的之前或之后
+void listDelNode(list *list, listNode *node);//从链表 list 中删除给定节点 node
+listIter *listGetIterator(list *list, int direction);//为给定链表创建一个迭代器，之后每次对这个迭代器调用 listNext 都返回被迭代到的链表节点
+listNode *listNext(listIter *iter);//返回迭代器当前所指向的节点。
+void listReleaseIterator(listIter *iter);//释放迭代器
+list *listDup(list *orig);//复制整个链表。
+listNode *listSearchKey(list *list, void *key);//查找链表 list 中值和 key 匹配的节点。
+listNode *listIndex(list *list, long index);//返回链表在给定索引上的值。
+void listRewind(list *list, listIter *li);//将迭代器的方向设置为 AL_START_HEAD，并将迭代指针重新指向表头节点。
+void listRewindTail(list *list, listIter *li);//将迭代器的方向设置为 AL_START_TAIL，并将迭代指针重新指向表尾节点。
+void listRotate(list *list);//取出链表的表尾节点，并将它移动到表头，成为新的表头节点。
 
 /* Directions for iterators 
  *
