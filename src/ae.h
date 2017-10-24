@@ -80,7 +80,7 @@ struct aeEventLoop;
  *
  * 事件接口
  */
-typedef void aeFileProc(struct aeEventLoop *eventLoop, int fd, void *clientData, int mask);
+typedef void aeFileProc(struct aeEventLoop *eventLoop, int fd, void *clientData, int mask);//根据 mask 参数的值，监听 fd 文件的状态,当 fd 可用时，执行 proc 函数
 typedef int aeTimeProc(struct aeEventLoop *eventLoop, long long id, void *clientData);
 typedef void aeEventFinalizerProc(struct aeEventLoop *eventLoop, void *clientData);
 typedef void aeBeforeSleepProc(struct aeEventLoop *eventLoop);
