@@ -189,23 +189,23 @@ typedef struct aeEventLoop {
 } aeEventLoop;
 
 /* Prototypes */
-aeEventLoop *aeCreateEventLoop(int setsize);
-void aeDeleteEventLoop(aeEventLoop *eventLoop);
-void aeStop(aeEventLoop *eventLoop);
+aeEventLoop *aeCreateEventLoop(int setsize);//初始化事件处理器状态
+void aeDeleteEventLoop(aeEventLoop *eventLoop);//删除事件处理器
+void aeStop(aeEventLoop *eventLoop);//停止事件处理器
 int aeCreateFileEvent(aeEventLoop *eventLoop, int fd, int mask,
-        aeFileProc *proc, void *clientData);
-void aeDeleteFileEvent(aeEventLoop *eventLoop, int fd, int mask);
-int aeGetFileEvents(aeEventLoop *eventLoop, int fd);
+        aeFileProc *proc, void *clientData);//根据 mask 参数的值，监听 fd 文件的状态，当 fd 可用时，执行 proc 函数
+void aeDeleteFileEvent(aeEventLoop *eventLoop, int fd, int mask);//将 fd 从 mask 指定的监听队列中删除
+int aeGetFileEvents(aeEventLoop *eventLoop, int fd);//获取给定 fd 正在监听的事件类型
 long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,
         aeTimeProc *proc, void *clientData,
-        aeEventFinalizerProc *finalizerProc);
-int aeDeleteTimeEvent(aeEventLoop *eventLoop, long long id);
-int aeProcessEvents(aeEventLoop *eventLoop, int flags);
-int aeWait(int fd, int mask, long long milliseconds);
-void aeMain(aeEventLoop *eventLoop);
-char *aeGetApiName(void);
-void aeSetBeforeSleepProc(aeEventLoop *eventLoop, aeBeforeSleepProc *beforesleep);
-int aeGetSetSize(aeEventLoop *eventLoop);
-int aeResizeSetSize(aeEventLoop *eventLoop, int setsize);
+        aeEventFinalizerProc *finalizerProc);//创建时间事件
+int aeDeleteTimeEvent(aeEventLoop *eventLoop, long long id);//删除给定 id 的时间事件
+int aeProcessEvents(aeEventLoop *eventLoop, int flags);//处理所有已到达的时间事件，以及所有已就绪的文件事件。
+int aeWait(int fd, int mask, long long milliseconds);//在给定毫秒内等待，直到 fd 变成可写、可读或异常
+void aeMain(aeEventLoop *eventLoop);//事件处理器的主循环
+char *aeGetApiName(void);//返回所使用的多路复用库的名称
+void aeSetBeforeSleepProc(aeEventLoop *eventLoop, aeBeforeSleepProc *beforesleep);//设置处理事件前需要被执行的函数
+int aeGetSetSize(aeEventLoop *eventLoop);//返回当前事件槽大小
+int aeResizeSetSize(aeEventLoop *eventLoop, int setsize);//调整事件槽的大小
 
 #endif
