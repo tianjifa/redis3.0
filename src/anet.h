@@ -43,26 +43,26 @@
 #define AF_LOCAL AF_UNIX
 #endif
 
-int anetTcpConnect(char *err, char *addr, int port);
-int anetTcpNonBlockConnect(char *err, char *addr, int port);
-int anetTcpNonBlockBindConnect(char *err, char *addr, int port, char *source_addr);
-int anetUnixConnect(char *err, char *path);
-int anetUnixNonBlockConnect(char *err, char *path);
-int anetRead(int fd, char *buf, int count);
-int anetResolve(char *err, char *host, char *ipbuf, size_t ipbuf_len);
-int anetResolveIP(char *err, char *host, char *ipbuf, size_t ipbuf_len);
-int anetTcpServer(char *err, int port, char *bindaddr, int backlog);
-int anetTcp6Server(char *err, int port, char *bindaddr, int backlog);
-int anetUnixServer(char *err, char *path, mode_t perm, int backlog);
-int anetTcpAccept(char *err, int serversock, char *ip, size_t ip_len, int *port);
-int anetUnixAccept(char *err, int serversock);
-int anetWrite(int fd, char *buf, int count);
-int anetNonBlock(char *err, int fd);
-int anetEnableTcpNoDelay(char *err, int fd);
-int anetDisableTcpNoDelay(char *err, int fd);
-int anetTcpKeepAlive(char *err, int fd);
-int anetPeerToString(int fd, char *ip, size_t ip_len, int *port);
-int anetKeepAlive(char *err, int fd, int interval);
-int anetSockName(int fd, char *ip, size_t ip_len, int *port);
+int anetTcpConnect(char *err, char *addr, int port);//创建阻塞 TCP 连接
+int anetTcpNonBlockConnect(char *err, char *addr, int port);//创建非阻塞 TCP 连接
+int anetTcpNonBlockBindConnect(char *err, char *addr, int port, char *source_addr);//创建非阻塞 TCP 连接
+int anetUnixConnect(char *err, char *path);//创建阻塞本地连接
+int anetUnixNonBlockConnect(char *err, char *path);//创建非阻塞本地连接
+int anetRead(int fd, char *buf, int count);//带 short count 处理的读取函数
+int anetResolve(char *err, char *host, char *ipbuf, size_t ipbuf_len);//解析所有的东西
+int anetResolveIP(char *err, char *host, char *ipbuf, size_t ipbuf_len);//单单解析IP的地址
+int anetTcpServer(char *err, int port, char *bindaddr, int backlog);//创建socket的server
+int anetTcp6Server(char *err, int port, char *bindaddr, int backlog);//创建只能发送和接收ipv6的socket的server
+int anetUnixServer(char *err, char *path, mode_t perm, int backlog);//创建unix域的的socket的server
+int anetTcpAccept(char *err, int serversock, char *ip, size_t ip_len, int *port);//获得tcp连接请求并建立连接
+int anetUnixAccept(char *err, int serversock);//获得unix域连接请求并建立连接
+int anetWrite(int fd, char *buf, int count);//对write()的简单封装
+int anetNonBlock(char *err, int fd);//将 fd 设置为非阻塞模式（O_NONBLOCK）
+int anetEnableTcpNoDelay(char *err, int fd);//禁用 Nagle 算法
+int anetDisableTcpNoDelay(char *err, int fd);//启用 Nagle 算法
+int anetTcpKeepAlive(char *err, int fd);//开启 TCP 的 keep alive 选项
+int anetPeerToString(int fd, char *ip, size_t ip_len, int *port);//获取连接客户端的 IP 和端口号
+int anetKeepAlive(char *err, int fd, int interval);//修改 TCP 连接的 keep alive 选项
+int anetSockName(int fd, char *ip, size_t ip_len, int *port);//获取服务器本机的 IP 和端口号
 
 #endif
