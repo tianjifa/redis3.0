@@ -35,15 +35,15 @@
 #ifndef _ZIPMAP_H
 #define _ZIPMAP_H
 
-unsigned char *zipmapNew(void);
-unsigned char *zipmapSet(unsigned char *zm, unsigned char *key, unsigned int klen, unsigned char *val, unsigned int vlen, int *update);
-unsigned char *zipmapDel(unsigned char *zm, unsigned char *key, unsigned int klen, int *deleted);
-unsigned char *zipmapRewind(unsigned char *zm);
-unsigned char *zipmapNext(unsigned char *zm, unsigned char **key, unsigned int *klen, unsigned char **value, unsigned int *vlen);
-int zipmapGet(unsigned char *zm, unsigned char *key, unsigned int klen, unsigned char **value, unsigned int *vlen);
-int zipmapExists(unsigned char *zm, unsigned char *key, unsigned int klen);
-unsigned int zipmapLen(unsigned char *zm);
-size_t zipmapBlobLen(unsigned char *zm);
-void zipmapRepr(unsigned char *p);
+unsigned char *zipmapNew(void);//创建一个新的zipmap，这个空zipmap占用2个byte的内存空间
+unsigned char *zipmapSet(unsigned char *zm, unsigned char *key, unsigned int klen, unsigned char *val, unsigned int vlen, int *update);//加入新的key/value或者修改zipmap中已有key对应的value.
+unsigned char *zipmapDel(unsigned char *zm, unsigned char *key, unsigned int klen, int *deleted);//从zipmap中删除key/value
+unsigned char *zipmapRewind(unsigned char *zm);//在通过 zipmapNext 遍历 zipmap 之前调用,返回指向 zipmap 首个节点的指针。
+unsigned char *zipmapNext(unsigned char *zm, unsigned char **key, unsigned int *klen, unsigned char **value, unsigned int *vlen);//这个函数用于遍历 zipmap 的所有元素。
+int zipmapGet(unsigned char *zm, unsigned char *key, unsigned int klen, unsigned char **value, unsigned int *vlen);//在 zipmap 中按 key 进行查找，将值的指针保存到 *value 中，并将值的长度保存到 *vlen 中。
+int zipmapExists(unsigned char *zm, unsigned char *key, unsigned int klen);//如果给定 key 存在于 zipmap 中，那么返回 1 ，不存在则返回 0
+unsigned int zipmapLen(unsigned char *zm);//返回 zipmap 中包含的节点数
+size_t zipmapBlobLen(unsigned char *zm);//返回整个 zipmap 占用的字节大小
+void zipmapRepr(unsigned char *p);//打印p开头的kye-value对
 
 #endif
