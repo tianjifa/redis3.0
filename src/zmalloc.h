@@ -65,21 +65,21 @@
 #define ZMALLOC_LIB "libc"
 #endif
 
-void *zmalloc(size_t size);
-void *zcalloc(size_t size);
-void *zrealloc(void *ptr, size_t size);
-void zfree(void *ptr);
-char *zstrdup(const char *s);
-size_t zmalloc_used_memory(void);
-void zmalloc_enable_thread_safeness(void);
-void zmalloc_set_oom_handler(void (*oom_handler)(size_t));
-float zmalloc_get_fragmentation_ratio(size_t rss);
-size_t zmalloc_get_rss(void);
-size_t zmalloc_get_private_dirty(void);
-void zlibc_free(void *ptr);
+void *zmalloc(size_t size);//申请size大bytes的内存区域
+void *zcalloc(size_t size);//申请size个sizeof(byte)大的内存区域
+void *zrealloc(void *ptr, size_t size);//重新分配size大小的内存
+void zfree(void *ptr);//释放ptr开始内存块，与zmalloc,zcalloc,zrealloc配对
+char *zstrdup(const char *s);//复制字符串
+size_t zmalloc_used_memory(void);//得到已申请内存块总大小
+void zmalloc_enable_thread_safeness(void);//设置线程安全zmalloc开关，即操作前lock
+void zmalloc_set_oom_handler(void (*oom_handler)(size_t));//可自定义设置内存溢出的处理方法
+float zmalloc_get_fragmentation_ratio(size_t rss);//所给大小与已使用内存大小之比
+size_t zmalloc_get_rss(void);//用来获取进程的RSS(Resident Set Size，指实际使用物理内存,包含共享库占用的内存)
+size_t zmalloc_get_private_dirty(void);//获取私有的脏数据大小
+void zlibc_free(void *ptr);//原始系统free释放方法
 
 #ifndef HAVE_MALLOC_SIZE
-size_t zmalloc_size(void *ptr);
+size_t zmalloc_size(void *ptr);//内存大小
 #endif
 
 #endif /* __ZMALLOC_H */
