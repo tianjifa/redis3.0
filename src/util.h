@@ -32,14 +32,14 @@
 
 #include "sds.h"
 
-int stringmatchlen(const char *p, int plen, const char *s, int slen, int nocase);
+int stringmatchlen(const char *p, int plen, const char *s, int slen, int nocase);//支持glob-style的通配符格式
 int stringmatch(const char *p, const char *s, int nocase);
-long long memtoll(const char *p, int *err);
-int ll2string(char *s, size_t len, long long value);
-int string2ll(const char *s, size_t slen, long long *value);
-int string2l(const char *s, size_t slen, long *value);
-int d2string(char *buf, size_t len, double value);
-sds getAbsolutePath(char *filename);
-int pathIsBaseName(char *path);
+long long memtoll(const char *p, int *err);//将表示内存数量的字符串转换成数字*字节
+int ll2string(char *s, size_t len, long long value);//将长时间转换成字符串。返回的数量需要代表数字的字符，如果通过，可以更短缓冲区长度不足以存储整个数字。
+int string2ll(const char *s, size_t slen, long long *value);//将一个字符串转换成很长的时间。如果字符串可以被解析，则返回1进入(非溢出)的长，否则为0。该值将被设置为适当时的解析值。
+int string2l(const char *s, size_t slen, long *value);//将一个字符串转换成long。如果字符串可以被解析为(非溢出)long，否则为0。该值将被设置为解析在适当的价值。
+int d2string(char *buf, size_t len, double value);//将double转换为字符串表示形式。返回所需的字节数。这个表示法应该始终可以用stdtod(3)来表示。
+sds getAbsolutePath(char *filename);//给定文件名，将绝对路径作为SDS字符串返回，如果由于某种原因失败，则返回NULL。
+int pathIsBaseName(char *path);//检查在指定路径中是否存在/或字符。
 
 #endif
