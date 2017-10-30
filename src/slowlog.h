@@ -55,8 +55,8 @@ typedef struct slowlogEntry {
 } slowlogEntry;
 
 /* Exported API */
-void slowlogInit(void);
-void slowlogPushEntryIfNeeded(robj **argv, int argc, long long duration);
+void slowlogInit(void);//初始化服务器慢查询功能。
+void slowlogPushEntryIfNeeded(robj **argv, int argc, long long duration);//根据服务器设置的最大日志长度，可能会对日志进行截断（trim）
 
 /* Exported commands */
-void slowlogCommand(redisClient *c);
+void slowlogCommand(redisClient *c);//SLOWLOG 命令的实现，支持 GET / RESET 和 LEN 参数
