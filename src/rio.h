@@ -137,15 +137,15 @@ static inline off_t rioTell(rio *r) {
     return r->tell(r);
 }
 
-void rioInitWithFile(rio *r, FILE *fp);
-void rioInitWithBuffer(rio *r, sds s);
+void rioInitWithFile(rio *r, FILE *fp);//初始化文件流
+void rioInitWithBuffer(rio *r, sds s);//初始化内存流
 
-size_t rioWriteBulkCount(rio *r, char prefix, int count);
-size_t rioWriteBulkString(rio *r, const char *buf, size_t len);
-size_t rioWriteBulkLongLong(rio *r, long long l);
-size_t rioWriteBulkDouble(rio *r, double d);
+size_t rioWriteBulkCount(rio *r, char prefix, int count);//以带 '\r\n' 后缀的形式写入字符串表示的 count 到 RIO成功返回写入的数量，失败返回 0.
+size_t rioWriteBulkString(rio *r, const char *buf, size_t len);//以 "$<count>\r\n<payload>\r\n" 的形式写入二进制安全字符
+size_t rioWriteBulkLongLong(rio *r, long long l);//以 "$<count>\r\n<payload>\r\n" 的格式写入 long long 值
+size_t rioWriteBulkDouble(rio *r, double d);//以 "$<count>\r\n<payload>\r\n" 的格式写入 double 值
 
-void rioGenericUpdateChecksum(rio *r, const void *buf, size_t len);
-void rioSetAutoSync(rio *r, off_t bytes);
+void rioGenericUpdateChecksum(rio *r, const void *buf, size_t len);//通用校验和计算函数
+void rioSetAutoSync(rio *r, off_t bytes);//通过显示地、间隔性地调用 fsync ，可以将写入的 I/O 压力分担到多次 fsync 调用中。
 
 #endif
