@@ -1519,62 +1519,62 @@ extern dictType replScriptCacheDictType;
  *----------------------------------------------------------------------------*/
 
 /* Utils */
-long long ustime(void);
-long long mstime(void);
-void getRandomHexChars(char *p, unsigned int len);
-uint64_t crc64(uint64_t crc, const unsigned char *s, uint64_t l);
-void exitFromChild(int retcode);
-size_t redisPopcount(void *s, long count);
-void redisSetProcTitle(char *title);
+long long ustime(void);//返回微秒格式的 UNIX 时间,1 秒 = 1 000 000 微秒
+long long mstime(void);//返回毫秒格式的 UNIX 时间,1 秒 = 1 000 毫秒
+void getRandomHexChars(char *p, unsigned int len);//设置服务器的运行 ID
+uint64_t crc64(uint64_t crc, const unsigned char *s, uint64_t l);//64位CRC校验码的算法
+void exitFromChild(int retcode);//用_exit()或exit()退出，获得正确的覆盖率信息。
+size_t redisPopcount(void *s, long count);//计算长度为 count 的二进制数组指针 s 被设置为 1 的位的数量。
+void redisSetProcTitle(char *title);//为服务器进程设置名字
 
 /* networking.c -- Networking and Client related operations */
-redisClient *createClient(int fd);
-void closeTimedoutClients(void);
-void freeClient(redisClient *c);
-void freeClientAsync(redisClient *c);
-void resetClient(redisClient *c);
-void sendReplyToClient(aeEventLoop *el, int fd, void *privdata, int mask);
-void addReply(redisClient *c, robj *obj);
-void *addDeferredMultiBulkLength(redisClient *c);
-void setDeferredMultiBulkLength(redisClient *c, void *node, long length);
-void addReplySds(redisClient *c, sds s);
-void processInputBuffer(redisClient *c);
-void acceptTcpHandler(aeEventLoop *el, int fd, void *privdata, int mask);
-void acceptUnixHandler(aeEventLoop *el, int fd, void *privdata, int mask);
-void readQueryFromClient(aeEventLoop *el, int fd, void *privdata, int mask);
-void addReplyBulk(redisClient *c, robj *obj);
-void addReplyBulkCString(redisClient *c, char *s);
-void addReplyBulkCBuffer(redisClient *c, void *p, size_t len);
-void addReplyBulkLongLong(redisClient *c, long long ll);
-void acceptHandler(aeEventLoop *el, int fd, void *privdata, int mask);
-void addReply(redisClient *c, robj *obj);
-void addReplySds(redisClient *c, sds s);
-void addReplyError(redisClient *c, char *err);
-void addReplyStatus(redisClient *c, char *status);
-void addReplyDouble(redisClient *c, double d);
-void addReplyLongLong(redisClient *c, long long ll);
-void addReplyMultiBulkLen(redisClient *c, long length);
-void copyClientOutputBuffer(redisClient *dst, redisClient *src);
-void *dupClientReplyValue(void *o);
+redisClient *createClient(int fd);//为主服务器绑定事件
+void closeTimedoutClients(void);//???????????????
+void freeClient(redisClient *c);//关闭超时客户端
+void freeClientAsync(redisClient *c);//异步地释放给定的客户端
+void resetClient(redisClient *c);//在客户端执行完命令之后执行：重置客户端以准备执行下个命令
+void sendReplyToClient(aeEventLoop *el, int fd, void *privdata, int mask);//负责传送命令回复的写处理器
+void addReply(redisClient *c, robj *obj);//在redisClient的buffer中写入数据，数据存在obj->ptr的指针中
+void *addDeferredMultiBulkLength(redisClient *c);//当发送 Multi Bulk 回复时，先创建一个空的链表，之后再用实际的回复填充它
+void setDeferredMultiBulkLength(redisClient *c, void *node, long length);//设置 Multi Bulk 回复的长度
+void addReplySds(redisClient *c, sds s);//将 SDS 中的内容复制到回复缓冲区
+void processInputBuffer(redisClient *c);//处理客户端输入的命令内容
+void acceptTcpHandler(aeEventLoop *el, int fd, void *privdata, int mask);//创建一个 TCP 连接处理器
+void acceptUnixHandler(aeEventLoop *el, int fd, void *privdata, int mask);//创建一个本地连接处理器
+void readQueryFromClient(aeEventLoop *el, int fd, void *privdata, int mask);//读取客户端的查询缓冲区内容
+void addReplyBulk(redisClient *c, robj *obj);//返回一个 Redis 对象作为回复
+void addReplyBulkCString(redisClient *c, char *s);//返回一个 C 字符串作为回复
+void addReplyBulkCBuffer(redisClient *c, void *p, size_t len);//返回一个 C 缓冲区作为回复
+void addReplyBulkLongLong(redisClient *c, long long ll);//返回一个 long long 值作为回复
+void acceptHandler(aeEventLoop *el, int fd, void *privdata, int mask);//??????????????
+void addReply(redisClient *c, robj *obj);//在redisClient的buffer中写入数据，数据存在obj->ptr的指针中//??????与以上重复？？？
+void addReplySds(redisClient *c, sds s);//在回复中添加Sds字符串,下面的额addReply()系列方法原理基本类似
+void addReplyError(redisClient *c, char *err);//往Reply中添加error类的信息
+void addReplyStatus(redisClient *c, char *status);//创建一次 SORT 操作
+void addReplyDouble(redisClient *c, double d);//在bulk reply中添加一个double类型值，bulk的意思为大块的，bulk reply的意思为大数据量的回复
+void addReplyLongLong(redisClient *c, long long ll);//返回一个整数回复,格式为 :10086\r\n
+void addReplyMultiBulkLen(redisClient *c, long length);//???
+void copyClientOutputBuffer(redisClient *dst, redisClient *src);//将源Client的输出buffer复制给目标Client
+void *dupClientReplyValue(void *o);//复制value一份
 void getClientsMaxBuffers(unsigned long *longest_output_list,
-                          unsigned long *biggest_input_buffer);
-void formatPeerId(char *peerid, size_t peerid_len, char *ip, int port);
-char *getClientPeerId(redisClient *client);
-sds catClientInfoString(sds s, redisClient *client);
-sds getAllClientsInfoString(void);
-void rewriteClientCommandVector(redisClient *c, int argc, ...);
-void rewriteClientCommandArgument(redisClient *c, int i, robj *newval);
-unsigned long getClientOutputBufferMemoryUsage(redisClient *c);
-void freeClientsInAsyncFreeQueue(void);
-void asyncCloseClientOnOutputBufferLimitReached(redisClient *c);
-int getClientLimitClassByName(char *name);
-char *getClientLimitClassName(int class);
-void flushSlavesOutputBuffers(void);
-void disconnectSlaves(void);
-int listenToPort(int port, int *fds, int *count);
-void pauseClients(mstime_t duration);
-int clientsArePaused(void);
-int processEventsWhileBlocked(void);
+                          unsigned long *biggest_input_buffer);//获取Client中输入buffer和输出buffer的最大长度值
+void formatPeerId(char *peerid, size_t peerid_len, char *ip, int port);//格式化ip,port端口号的输出，ip:port 
+char *getClientPeerId(redisClient *client);//获取c->peerid客户端的地址信息
+sds catClientInfoString(sds s, redisClient *client);//格式化的输出客户端的属性信息，直接返回一个拼接好的字符串
+sds getAllClientsInfoString(void);//获取所有Client客户端的属性信息，并连接成一个总的字符串并输出
+void rewriteClientCommandVector(redisClient *c, int argc, ...);//重写客户端的命令集合，旧的命令集合的应用计数减1，新的Command  Vector的命令集合增1 
+void rewriteClientCommandArgument(redisClient *c, int i, robj *newval);//重写Client中的第i个参数
+unsigned long getClientOutputBufferMemoryUsage(redisClient *c);//获取Client中已经用去的输出buffer的大小
+void freeClientsInAsyncFreeQueue(void);//异步的free客户端
+void asyncCloseClientOnOutputBufferLimitReached(redisClient *c);//异步的关闭Client，如果缓冲区中的软限制或是硬限制已经到达的时候，缓冲区超出限制的结果会导致释放不安全，
+int getClientLimitClassByName(char *name);//根据名字，获取客户端的类型常量
+char *getClientLimitClassName(int class);//根据客户端的类型，获取名字
+void flushSlavesOutputBuffers(void);//函数的辅助函数，用于在不进入事件循环的情况下，冲洗所有从服务器的输出缓冲区。
+void disconnectSlaves(void);//断开所有从服务器的连接，强制所有从服务器执行重同步
+int listenToPort(int port, int *fds, int *count);//绑定监听端口
+void pauseClients(mstime_t duration);//暂停客户端，让服务器在指定的时间内不再接受被暂停客户端发来的命令可以用于系统更新，并在内部由 CLUSTER FAILOVER 命令使用。
+int clientsArePaused(void);//判断服务器目前被暂停客户端的数量，没有任何客户端被暂停时，返回 0 。
+int processEventsWhileBlocked(void);//让服务器在被阻塞的情况下，仍然处理某些事件。
 
 #ifdef __GNUC__
 void addReplyErrorFormat(redisClient *c, const char *fmt, ...)
