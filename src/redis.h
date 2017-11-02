@@ -1634,31 +1634,31 @@ robj *getDecodedObject(robj *o);//如果对象已经是 RAW 编码的，那么�
 size_t stringObjectLen(robj *o);//返回字符串对象中字符串值的长度
 robj *createStringObjectFromLongLong(long long value);//根据传入的整数值，创建一个字符串对象
 robj *createStringObjectFromLongDouble(long double value);//根据传入的 long double 值，为它创建一个字符串对象,对象将 long double 转换为字符串来保存
-robj *createListObject(void);
-robj *createZiplistObject(void);
-robj *createSetObject(void);
-robj *createIntsetObject(void);
-robj *createHashObject(void);
-robj *createZsetObject(void);
-robj *createZsetZiplistObject(void);
-int getLongFromObjectOrReply(redisClient *c, robj *o, long *target, const char *msg);
-int checkType(redisClient *c, robj *o, int type);
-int getLongLongFromObjectOrReply(redisClient *c, robj *o, long long *target, const char *msg);
-int getDoubleFromObjectOrReply(redisClient *c, robj *o, double *target, const char *msg);
-int getLongLongFromObject(robj *o, long long *target);
-int getLongDoubleFromObject(robj *o, long double *target);
-int getLongDoubleFromObjectOrReply(redisClient *c, robj *o, long double *target, const char *msg);
-char *strEncoding(int encoding);
-int compareStringObjects(robj *a, robj *b);
-int collateStringObjects(robj *a, robj *b);
-int equalStringObjects(robj *a, robj *b);
-unsigned long long estimateObjectIdleTime(robj *o);
+robj *createListObject(void);//创建一个 LINKEDLIST 编码的列表对象
+robj *createZiplistObject(void);//创建一个 ZIPLIST 编码的列表对象
+robj *createSetObject(void);//创建一个 SET 编码的集合对象
+robj *createIntsetObject(void);//创建一个 INTSET 编码的集合对象
+robj *createHashObject(void);//创建一个 ZIPLIST 编码的哈希对象
+robj *createZsetObject(void);//创建一个 SKIPLIST 编码的有序集合
+robj *createZsetZiplistObject(void);//创建一个 ZIPLIST 编码的有序集合
+int getLongFromObjectOrReply(redisClient *c, robj *o, long *target, const char *msg);//尝试从对象 o 中取出 long 类型值，或者尝试将对象 o 中的值转换为 long 类型值，并将这个得出的整数值保存到 *target 。
+int checkType(redisClient *c, robj *o, int type);//检查对象 o 的类型是否和 type 相同
+int getLongLongFromObjectOrReply(redisClient *c, robj *o, long long *target, const char *msg);//尝试从对象 o 中取出整数值，或者尝试将对象 o 中的值转换为整数值，并将这个得出的整数值保存到 *target 。
+int getDoubleFromObjectOrReply(redisClient *c, robj *o, double *target, const char *msg);//尝试从对象 o 中取出 double 值
+int getLongLongFromObject(robj *o, long long *target);//如果 o 为 NULL ，那么将 *target 设为 0 。
+int getLongDoubleFromObject(robj *o, long double *target);//尝试从对象中取出 long double 值
+int getLongDoubleFromObjectOrReply(redisClient *c, robj *o, long double *target, const char *msg);//尝试从对象 o 中取出 long double 值：
+char *strEncoding(int encoding);//返回编码的字符串表示
+int compareStringObjects(robj *a, robj *b);//以REDIS_COMPARE_BINARY的方式比较两字符串对象
+int collateStringObjects(robj *a, robj *b);//以REDIS_COMPARE_COLL的方式比较两字符串对象
+int equalStringObjects(robj *a, robj *b);//字符串比较
+unsigned long long estimateObjectIdleTime(robj *o);//获取LRU clock，用于LRU算法 
 #define sdsEncodedObject(objptr) (objptr->encoding == REDIS_ENCODING_RAW || objptr->encoding == REDIS_ENCODING_EMBSTR)
 
 /* Synchronous I/O with timeout */
-ssize_t syncWrite(int fd, char *ptr, ssize_t size, long long timeout);
-ssize_t syncRead(int fd, char *ptr, ssize_t size, long long timeout);
-ssize_t syncReadLine(int fd, char *ptr, ssize_t size, long long timeout);
+ssize_t syncWrite(int fd, char *ptr, ssize_t size, long long timeout);//将指定的负载写入“fd”。如果写入整个有效负载，将在“timeout”毫秒内完成操作，操作成功并返回“size”。否则，操作失败，返回- 1，并且可以对文件描述符执行未指定的部分写入。
+ssize_t syncRead(int fd, char *ptr, ssize_t size, long long timeout);//从“fd”读取指定的字节数。如果所有的字节都在“timeout”毫秒内读取，那么将返回操作成功和“size”。否则，操作失败，返回- 1，并且可以从文件描述符读取未指定的数据量。
+ssize_t syncReadLine(int fd, char *ptr, ssize_t size, long long timeout);//读取一行，确保每个字符都不需要超过“超时”毫秒。
 
 /* Replication */
 void replicationFeedSlaves(list *slaves, int dictid, robj **argv, int argc);
