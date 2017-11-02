@@ -252,35 +252,35 @@ typedef void (dictScanFunction)(void *privdata, const dictEntry *de);
 #define dictIsRehashing(ht) ((ht)->rehashidx != -1)
 
 /* API */
-dict *dictCreate(dictType *type, void *privDataPtr);
-int dictExpand(dict *d, unsigned long size);
-int dictAdd(dict *d, void *key, void *val);
-dictEntry *dictAddRaw(dict *d, void *key);
-int dictReplace(dict *d, void *key, void *val);
-dictEntry *dictReplaceRaw(dict *d, void *key);
-int dictDelete(dict *d, const void *key);
-int dictDeleteNoFree(dict *d, const void *key);
-void dictRelease(dict *d);
-dictEntry * dictFind(dict *d, const void *key);
-void *dictFetchValue(dict *d, const void *key);
-int dictResize(dict *d);
-dictIterator *dictGetIterator(dict *d);
-dictIterator *dictGetSafeIterator(dict *d);
-dictEntry *dictNext(dictIterator *iter);
-void dictReleaseIterator(dictIterator *iter);
-dictEntry *dictGetRandomKey(dict *d);
-int dictGetRandomKeys(dict *d, dictEntry **des, int count);
-void dictPrintStats(dict *d);
-unsigned int dictGenHashFunction(const void *key, int len);
-unsigned int dictGenCaseHashFunction(const unsigned char *buf, int len);
-void dictEmpty(dict *d, void(callback)(void*));
-void dictEnableResize(void);
-void dictDisableResize(void);
-int dictRehash(dict *d, int n);
-int dictRehashMilliseconds(dict *d, int ms);
-void dictSetHashFunctionSeed(unsigned int initval);
-unsigned int dictGetHashFunctionSeed(void);
-unsigned long dictScan(dict *d, unsigned long v, dictScanFunction *fn, void *privdata);
+dict *dictCreate(dictType *type, void *privDataPtr);//创建一个新的字典
+int dictExpand(dict *d, unsigned long size);//调整字典的大小
+int dictAdd(dict *d, void *key, void *val);//尝试将给定键值对添加到字典中
+dictEntry *dictAddRaw(dict *d, void *key);//如果键不存在，那么程序创建新的哈希节点，将节点和键关联，并插入到字典，然后返回节点本身。
+int dictReplace(dict *d, void *key, void *val);//将给定的键值对添加到字典中，如果键已经存在，那么删除旧有的键值对。
+dictEntry *dictReplaceRaw(dict *d, void *key);//不论发生以上的哪一种情况,dictAddRaw() 都总是返回包含给定 key 的字典节点。
+int dictDelete(dict *d, const void *key);//从字典中删除包含给定键的节点,并且调用键值的释放函数来删除键值
+int dictDeleteNoFree(dict *d, const void *key);//从字典中删除包含给定键的节点,但不调用键值的释放函数来删除键值
+void dictRelease(dict *d);//删除并释放整个字典
+dictEntry * dictFind(dict *d, const void *key);//返回字典中包含键 key 的节点,找到返回节点，找不到返回 NULL
+void *dictFetchValue(dict *d, const void *key);//获取包含给定键的节点的值
+int dictResize(dict *d);//缩小给定字典,让它的已用节点数和字典大小之间的比率接近 1:1
+dictIterator *dictGetIterator(dict *d);//创建并返回给定字典的不安全迭代器
+dictIterator *dictGetSafeIterator(dict *d);//创建并返回给定节点的安全迭代器
+dictEntry *dictNext(dictIterator *iter);//返回迭代器指向的当前节点
+void dictReleaseIterator(dictIterator *iter);//释放给定字典迭代器
+dictEntry *dictGetRandomKey(dict *d);//随机返回字典中任意一个节点。
+int dictGetRandomKeys(dict *d, dictEntry **des, int count);//这是一个版本的命令行命令，它被修改，以返回多个条目，在哈希表的随机位置跳跃，并对条目进行线性扫描。
+void dictPrintStats(dict *d);//打印字典当前状态
+unsigned int dictGenHashFunction(const void *key, int len);//MurmurHash2哈希算法的实现，根据key值和指定长度进行哈希
+unsigned int dictGenCaseHashFunction(const unsigned char *buf, int len);//一种比较简单的哈希算法，也是对字符串进行哈希的
+void dictEmpty(dict *d, void(callback)(void*));//清空字典数据但不释放空间 
+void dictEnableResize(void);//可以手动地允许哈希表进行 rehash ，这在 Redis 使用子进程进行保存操作时，可以有效地利用 copy-on-write 机制。
+void dictDisableResize(void);//可以手动地阻止哈希表进行 rehash ，这在 Redis 使用子进程进行保存操作时，可以有效地利用 copy-on-write 机制。
+int dictRehash(dict *d, int n);//执行 N 步渐进式 rehash 。
+int dictRehashMilliseconds(dict *d, int ms);//在给定毫秒数内，以 100 步为单位，对字典进行 rehash 
+void dictSetHashFunctionSeed(unsigned int initval);//设置hash种子
+unsigned int dictGetHashFunctionSeed(void);//获取hash种子
+unsigned long dictScan(dict *d, unsigned long v, dictScanFunction *fn, void *privdata);//函数用于迭代给定字典中的元素。
 
 /* Hash table types */
 extern dictType dictTypeHeapStringCopyKey;
