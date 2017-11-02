@@ -1578,62 +1578,62 @@ int processEventsWhileBlocked(void);//让服务器在被阻塞的情况下，仍
 
 #ifdef __GNUC__
 void addReplyErrorFormat(redisClient *c, const char *fmt, ...)
-    __attribute__((format(printf, 2, 3)));
+    __attribute__((format(printf, 2, 3)));//????
 void addReplyStatusFormat(redisClient *c, const char *fmt, ...)
-    __attribute__((format(printf, 2, 3)));
+    __attribute__((format(printf, 2, 3)));//????
 #else
 void addReplyErrorFormat(redisClient *c, const char *fmt, ...);
 void addReplyStatusFormat(redisClient *c, const char *fmt, ...);
 #endif
 
 /* List data type */
-void listTypeTryConversion(robj *subject, robj *value);
-void listTypePush(robj *subject, robj *value, int where);
-robj *listTypePop(robj *subject, int where);
-unsigned long listTypeLength(robj *subject);
-listTypeIterator *listTypeInitIterator(robj *subject, long index, unsigned char direction);
-void listTypeReleaseIterator(listTypeIterator *li);
-int listTypeNext(listTypeIterator *li, listTypeEntry *entry);
-robj *listTypeGet(listTypeEntry *entry);
-void listTypeInsert(listTypeEntry *entry, robj *value, int where);
-int listTypeEqual(listTypeEntry *entry, robj *o);
-void listTypeDelete(listTypeEntry *entry);
-void listTypeConvert(robj *subject, int enc);
-void unblockClientWaitingData(redisClient *c);
-void handleClientsBlockedOnLists(void);
-void popGenericCommand(redisClient *c, int where);
+void listTypeTryConversion(robj *subject, robj *value);//对输入值 value 进行检查，看是否需要将 subject 从 ziplist 转换为双端链表，以便保存值 value 。
+void listTypePush(robj *subject, robj *value, int where);//调用者无须担心 value 的引用计数，因为这个函数会负责这方面的工作。
+robj *listTypePop(robj *subject, int where);//从列表的表头或表尾中弹出一个元素。
+unsigned long listTypeLength(robj *subject);//返回列表的节点数量
+listTypeIterator *listTypeInitIterator(robj *subject, long index, unsigned char direction);//创建并返回一个列表迭代器。
+void listTypeReleaseIterator(listTypeIterator *li);//释放迭代器
+int listTypeNext(listTypeIterator *li, listTypeEntry *entry);//使用 entry 结构记录迭代器当前指向的节点，并将迭代器的指针移动到下一个元素。
+robj *listTypeGet(listTypeEntry *entry);//返回 entry 结构当前所保存的列表节点。
+void listTypeInsert(listTypeEntry *entry, robj *value, int where);//将对象 value 插入到列表节点的之前或之后。
+int listTypeEqual(listTypeEntry *entry, robj *o);//将当前节点的值和对象 o 进行对比,函数在两值相等时返回 1 ，不相等时返回 0 。
+void listTypeDelete(listTypeEntry *entry);//删除 entry 所指向的节点
+void listTypeConvert(robj *subject, int enc);//将列表的底层编码从 ziplist 转换成双端链表
+void unblockClientWaitingData(redisClient *c);//打开一个在阻塞操作(如BLPOP)中等待的客户端。
+void handleClientsBlockedOnLists(void);//这个函数会遍历整个 serve.ready_keys 链表，并将里面的 key 的元素弹出给被阻塞客户端，从而解除客户端的阻塞状态。
+void popGenericCommand(redisClient *c, int where);//????
 
 /* MULTI/EXEC/WATCH... */
-void unwatchAllKeys(redisClient *c);
-void initClientMultiState(redisClient *c);
-void freeClientMultiState(redisClient *c);
-void queueMultiCommand(redisClient *c);
-void touchWatchedKey(redisDb *db, robj *key);
-void touchWatchedKeysOnFlush(int dbid);
-void discardTransaction(redisClient *c);
-void flagTransaction(redisClient *c);
+void unwatchAllKeys(redisClient *c);//取消客户端对所有键的监视。
+void initClientMultiState(redisClient *c);//初始化客户端的事务状态
+void freeClientMultiState(redisClient *c);//释放所有事务状态相关的资源
+void queueMultiCommand(redisClient *c);//将一个新命令添加到事务队列中
+void touchWatchedKey(redisDb *db, robj *key);//“触碰”一个键，如果这个键正在被某个/某些客户端监视着，那么这个/这些客户端在执行 EXEC 时事务将失败。
+void touchWatchedKeysOnFlush(int dbid);//根据key所在的的db，把此db下的watched-key统统touch一遍
+void discardTransaction(redisClient *c);//撤销事务操作
+void flagTransaction(redisClient *c);//标记一个事物为DIRTY_EXEC状态，最后这个事物会执行失败，，此方法调用于插入命令的时候
 
 /* Redis object implementation */
-void decrRefCount(robj *o);
-void decrRefCountVoid(void *o);
-void incrRefCount(robj *o);
-robj *resetRefCount(robj *obj);
-void freeStringObject(robj *o);
-void freeListObject(robj *o);
-void freeSetObject(robj *o);
-void freeZsetObject(robj *o);
-void freeHashObject(robj *o);
-robj *createObject(int type, void *ptr);
-robj *createStringObject(char *ptr, size_t len);
-robj *createRawStringObject(char *ptr, size_t len);
-robj *createEmbeddedStringObject(char *ptr, size_t len);
-robj *dupStringObject(robj *o);
-int isObjectRepresentableAsLongLong(robj *o, long long *llongval);
-robj *tryObjectEncoding(robj *o);
-robj *getDecodedObject(robj *o);
-size_t stringObjectLen(robj *o);
-robj *createStringObjectFromLongLong(long long value);
-robj *createStringObjectFromLongDouble(long double value);
+void decrRefCount(robj *o);//为对象的引用计数减一,当对象的引用计数降为 0 时，释放对象。
+void decrRefCountVoid(void *o);//作用于特定数据结构的释放函数包装
+void incrRefCount(robj *o);//为对象的引用计数增一
+robj *resetRefCount(robj *obj);//这个函数将对象的引用计数设为 0 ，但并不释放对象。
+void freeStringObject(robj *o);//释放字符串对象
+void freeListObject(robj *o);//释放列表对象
+void freeSetObject(robj *o);//释放集合对象
+void freeZsetObject(robj *o);//释放有序集合对象
+void freeHashObject(robj *o);//释放哈希对象
+robj *createObject(int type, void *ptr);//创建一个新 robj 对象
+robj *createStringObject(char *ptr, size_t len);//递减robj中的引用计数，引用到0后，释放对象
+robj *createRawStringObject(char *ptr, size_t len);//创建一个 REDIS_ENCODING_RAW 编码的字符对象,对象的指针指向一个 sds 结构
+robj *createEmbeddedStringObject(char *ptr, size_t len);//创建一个 REDIS_ENCODING_EMBSTR 编码的字符对象,这个字符串对象中的 sds 会和字符串对象的 redisObject 结构一起分配,因此这个字符也是不可修改的
+robj *dupStringObject(robj *o);//这个函数在复制一个包含整数值的字符串对象时，总是产生一个非共享的对象。
+int isObjectRepresentableAsLongLong(robj *o, long long *llongval);//检查对象 o 中的值能否表示为 long long 类型：
+robj *tryObjectEncoding(robj *o);//尝试对字符串对象进行编码，以节约内存。
+robj *getDecodedObject(robj *o);//如果对象已经是 RAW 编码的，那么对输入对象的引用计数增一，然后返回输入对象。
+size_t stringObjectLen(robj *o);//返回字符串对象中字符串值的长度
+robj *createStringObjectFromLongLong(long long value);//根据传入的整数值，创建一个字符串对象
+robj *createStringObjectFromLongDouble(long double value);//根据传入的 long double 值，为它创建一个字符串对象,对象将 long double 转换为字符串来保存
 robj *createListObject(void);
 robj *createZiplistObject(void);
 robj *createSetObject(void);
