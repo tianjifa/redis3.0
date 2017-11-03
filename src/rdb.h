@@ -129,24 +129,24 @@
 // 数据库的结尾（但不是 RDB 文件的结尾）
 #define REDIS_RDB_OPCODE_EOF        255
 
-int rdbSaveType(rio *rdb, unsigned char type);
-int rdbLoadType(rio *rdb);
-int rdbSaveTime(rio *rdb, time_t t);
-time_t rdbLoadTime(rio *rdb);
-int rdbSaveLen(rio *rdb, uint32_t len);
-uint32_t rdbLoadLen(rio *rdb, int *isencoded);
-int rdbSaveObjectType(rio *rdb, robj *o);
-int rdbLoadObjectType(rio *rdb);
-int rdbLoad(char *filename);
-int rdbSaveBackground(char *filename);
-void rdbRemoveTempFile(pid_t childpid);
-int rdbSave(char *filename);
-int rdbSaveObject(rio *rdb, robj *o);
-off_t rdbSavedObjectLen(robj *o);
-off_t rdbSavedObjectPages(robj *o);
-robj *rdbLoadObject(int type, rio *rdb);
-void backgroundSaveDoneHandler(int exitcode, int bysignal);
-int rdbSaveKeyValuePair(rio *rdb, robj *key, robj *val, long long expiretime, long long now);
-robj *rdbLoadStringObject(rio *rdb);
+int rdbSaveType(rio *rdb, unsigned char type);//将长度为 1 字节的字符 type 写入到 rdb 文件中。
+int rdbLoadType(rio *rdb);//从 rdb 中载入 1 字节长的 type 数据。
+int rdbSaveTime(rio *rdb, time_t t);//??????
+time_t rdbLoadTime(rio *rdb);//载入以秒为单位的过期时间，长度为 4 字节
+int rdbSaveLen(rio *rdb, uint32_t len);//对 len 进行特殊编码之后写入到 rdb 。
+uint32_t rdbLoadLen(rio *rdb, int *isencoded);//读入一个被编码的长度值。
+int rdbSaveObjectType(rio *rdb, robj *o);//将对象 o 的类型写入到 rdb 中
+int rdbLoadObjectType(rio *rdb);//加载一个RDB格式的类型，但如果类型不是一个有效的对象类型，则返回- 1。
+int rdbLoad(char *filename);//将给定 rdb 中保存的数据载入到数据库中。
+int rdbSaveBackground(char *filename);//????
+void rdbRemoveTempFile(pid_t childpid);//移除 BGSAVE 所产生的临时文件
+int rdbSave(char *filename);//将数据库保存到磁盘上。
+int rdbSaveObject(rio *rdb, robj *o);//将给定对象 o 保存到 rdb 中。
+off_t rdbSavedObjectLen(robj *o);//???????
+off_t rdbSavedObjectPages(robj *o);//???????
+robj *rdbLoadObject(int type, rio *rdb);//???????
+void backgroundSaveDoneHandler(int exitcode, int bysignal);//处理 BGSAVE 完成时发送的信号
+int rdbSaveKeyValuePair(rio *rdb, robj *key, robj *val, long long expiretime, long long now);//成功保存返回 1 ，当键已经过期时，返回 0 。
+robj *rdbLoadStringObject(rio *rdb);//???????
 
 #endif
