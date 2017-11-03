@@ -94,7 +94,7 @@ lzf_compress (const void *const in_data,  unsigned int in_len,
  */
 unsigned int 
 lzf_decompress (const void *const in_data,  unsigned int in_len,
-                void             *out_data, unsigned int out_len);
+                void             *out_data, unsigned int out_len);//将压缩的数据压缩为lzf_压缩函数的一些版本，并存储在位置in_data和length in_len中。结果将被存储在out_data中，最多可达out_len字符。
 
 #endif
 
