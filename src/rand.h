@@ -31,7 +31,7 @@
 #define REDIS_RANDOM_H
 
 int32_t redisLrand48();
-void redisSrand48(int32_t seedval);
+void redisSrand48(int32_t seedval);//设置随机数种子
 
 #define REDIS_LRAND48_MAX INT32_MAX
 
