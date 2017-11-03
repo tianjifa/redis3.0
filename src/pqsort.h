@@ -35,6 +35,6 @@
 
 void
 pqsort(void *a, size_t n, size_t es,
-    int (*cmp) (const void *, const void *), size_t lrange, size_t rrange);
+    int (*cmp) (const void *, const void *), size_t lrange, size_t rrange);//部分快速排序算法,只对一个数字序列的一部分进行排序
 
 #endif
