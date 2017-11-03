@@ -45,13 +45,13 @@ typedef struct intset {
 
 } intset;
 
-intset *intsetNew(void);
-intset *intsetAdd(intset *is, int64_t value, uint8_t *success);
-intset *intsetRemove(intset *is, int64_t value, int *success);
-uint8_t intsetFind(intset *is, int64_t value);
-int64_t intsetRandom(intset *is);
-uint8_t intsetGet(intset *is, uint32_t pos, int64_t *value);
-uint32_t intsetLen(intset *is);
-size_t intsetBlobLen(intset *is);
+intset *intsetNew(void);//创建并返回一个新的空整数集合
+intset *intsetAdd(intset *is, int64_t value, uint8_t *success);//尝试将元素 value 添加到整数集合中。
+intset *intsetRemove(intset *is, int64_t value, int *success);//从整数集合中删除值 value 。
+uint8_t intsetFind(intset *is, int64_t value);//检查给定值 value 是否集合中的元素。
+int64_t intsetRandom(intset *is);//从整数集合中随机返回一个元素,只能在集合非空时使用
+uint8_t intsetGet(intset *is, uint32_t pos, int64_t *value);//取出集合底层数组指定位置中的值，并将它保存到 value 指针中。
+uint32_t intsetLen(intset *is);//返回整数集合现有的元素个数
+size_t intsetBlobLen(intset *is);//返回整数集合现在占用的字节总数量,这个数量包括整数集合的结构大小，以及整数集合所有元素的总大小
 
 #endif // __INTSET_H
