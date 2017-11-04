@@ -1661,25 +1661,25 @@ ssize_t syncRead(int fd, char *ptr, ssize_t size, long long timeout);//从“fd�
 ssize_t syncReadLine(int fd, char *ptr, ssize_t size, long long timeout);//读取一行，确保每个字符都不需要超过“超时”毫秒。
 
 /* Replication */
-void replicationFeedSlaves(list *slaves, int dictid, robj **argv, int argc);
-void replicationFeedMonitors(redisClient *c, list *monitors, int dictid, robj **argv, int argc);
-void updateSlavesWaitingBgsave(int bgsaveerr);
-void replicationCron(void);
-void replicationHandleMasterDisconnection(void);
-void replicationCacheMaster(redisClient *c);
-void resizeReplicationBacklog(long long newsize);
-void replicationSetMaster(char *ip, int port);
-void replicationUnsetMaster(void);
-void refreshGoodSlavesCount(void);
-void replicationScriptCacheInit(void);
-void replicationScriptCacheFlush(void);
-void replicationScriptCacheAdd(sds sha1);
-int replicationScriptCacheExists(sds sha1);
-void processClientsWaitingReplicas(void);
-void unblockClientWaitingReplicas(redisClient *c);
-int replicationCountAcksByOffset(long long offset);
-void replicationSendNewlineToMaster(void);
-long long replicationGetSlaveOffset(void);
+void replicationFeedSlaves(list *slaves, int dictid, robj **argv, int argc);//将传入的参数发送给从服务器
+void replicationFeedMonitors(redisClient *c, list *monitors, int dictid, robj **argv, int argc);//将协议发给 Monitor
+void updateSlavesWaitingBgsave(int bgsaveerr);//这个函数是在 BGSAVE 完成之后的异步回调函数，它指导该怎么执行和 slave 相关的 RDB 下一步工作。
+void replicationCron(void);//复制 cron 函数，每秒调用一次
+void replicationHandleMasterDisconnection(void);//这个函数在从服务器以外地和主服务器失去联系时调用
+void replicationCacheMaster(redisClient *c);//它将当前的 master 记录到 master cache 里面，然后返回。
+void resizeReplicationBacklog(long long newsize);//动态调整 backlog 大小,当 backlog 是被扩大时，原有的数据会被保留，因为分配空间使用的是 realloc
+void replicationSetMaster(char *ip, int port);//将服务器设为指定地址的从服务器
+void replicationUnsetMaster(void);//取消复制，将服务器设置为主服务器
+void refreshGoodSlavesCount(void);//计算那些延迟值少于等于 min-slaves-max-lag 的从服务器数量。
+void replicationScriptCacheInit(void);//初始化缓存，只在服务器启动时调用
+void replicationScriptCacheFlush(void);//清空脚本缓存。
+void replicationScriptCacheAdd(sds sha1);//将脚本的 SHA1 添加到缓存中，如果缓存的数量已达到最大值，那么删除最旧的那个脚本（FIFO）
+int replicationScriptCacheExists(sds sha1);//如果脚本存在于脚本，那么返回 1 ；否则，返回 0 。
+void processClientsWaitingReplicas(void);//检查是否有客户在等待中被阻塞，因为我们从奴隶那里收到了足够的东西。
+void unblockClientWaitingReplicas(redisClient *c);//这由unblockClient()调用，以执行阻塞op类型的特定清理。我们只是将客户从等待复制的客户列表中删除。不要直接调用它，而是调用unblockClient()。
+int replicationCountAcksByOffset(long long offset);//得到当前已经发送来确认的从节点个数ackreplicas
+void replicationSendNewlineToMaster(void);//从客户端发送空行给主客户端，破坏了原本的协议格式，避免让主客户端检测出从客户端超时的情况
+long long replicationGetSlaveOffset(void);//得到当前从节点的复制偏移量myoffset
 
 /* Generic persistence functions */
 void startLoading(FILE *fp);
