@@ -1721,17 +1721,17 @@ typedef struct {
     int minex, maxex; /* are min or max exclusive? */
 } zlexrangespec;
 
-zskiplist *zslCreate(void);
-void zslFree(zskiplist *zsl);
-zskiplistNode *zslInsert(zskiplist *zsl, double score, robj *obj);
-unsigned char *zzlInsert(unsigned char *zl, robj *ele, double score);
-int zslDelete(zskiplist *zsl, double score, robj *obj);
-zskiplistNode *zslFirstInRange(zskiplist *zsl, zrangespec *range);
-zskiplistNode *zslLastInRange(zskiplist *zsl, zrangespec *range);
-double zzlGetScore(unsigned char *sptr);
-void zzlNext(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);
-void zzlPrev(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);
-unsigned int zsetLength(robj *zobj);
+zskiplist *zslCreate(void);//创建一个层数为 level 的跳跃表节点，并将节点的成员对象设置为 obj ，分值设置为 score 。
+void zslFree(zskiplist *zsl);//释放给定的跳跃表节点
+zskiplistNode *zslInsert(zskiplist *zsl, double score, robj *obj);//创建一个成员为 obj ，分值为 score 的新节点，并将这个新节点插入到跳跃表 zsl 中。
+unsigned char *zzlInsert(unsigned char *zl, robj *ele, double score);//将带有给定成员和分值的新节点插入到 eptr 所指向的节点的前面，如果 eptr 为 NULL ，那么将新节点插入到 ziplist 的末端。
+int zslDelete(zskiplist *zsl, double score, robj *obj);//内部删除函数
+zskiplistNode *zslFirstInRange(zskiplist *zsl, zrangespec *range);//返回 zsl 中第一个分值符合 range 中指定范围的节点。
+zskiplistNode *zslLastInRange(zskiplist *zsl, zrangespec *range);//返回 zsl 中最后一个分值符合 range 中指定范围的节点。
+double zzlGetScore(unsigned char *sptr);//取出 sptr 指向节点所保存的有序集合元素的分值
+void zzlNext(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);//根据 eptr 和 sptr ，移动它们分别指向下个成员和下个分值。
+void zzlPrev(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);//根据 eptr 和 sptr 的值，移动指针指向前一个节点。
+unsigned int zsetLength(robj *zobj);//通用排序集API
 void zsetConvert(robj *zobj, int encoding);
 unsigned long zslGetRank(zskiplist *zsl, double score, robj *o);
 
