@@ -1682,24 +1682,24 @@ void replicationSendNewlineToMaster(void);//从客户端发送空行给主客户
 long long replicationGetSlaveOffset(void);//得到当前从节点的复制偏移量myoffset
 
 /* Generic persistence functions */
-void startLoading(FILE *fp);
-void loadingProgress(off_t pos);
-void stopLoading(void);
+void startLoading(FILE *fp);//在全局状态中标记程序正在进行载入，并设置相应的载入状态。
+void loadingProgress(off_t pos);//刷新载入进度信息
+void stopLoading(void);//关闭服务器载入状态
 
 /* RDB persistence */
 #include "rdb.h"
 
 /* AOF persistence */
-void flushAppendOnlyFile(int force);
-void feedAppendOnlyFile(struct redisCommand *cmd, int dictid, robj **argv, int argc);
-void aofRemoveTempFile(pid_t childpid);
-int rewriteAppendOnlyFileBackground(void);
-int loadAppendOnlyFile(char *filename);
-void stopAppendOnly(void);
-int startAppendOnly(void);
-void backgroundRewriteDoneHandler(int exitcode, int bysignal);
-void aofRewriteBufferReset(void);
-unsigned long aofRewriteBufferSize(void);
+void flushAppendOnlyFile(int force);//将 AOF 缓存写入到文件中。
+void feedAppendOnlyFile(struct redisCommand *cmd, int dictid, robj **argv, int argc);//将命令追加到 AOF 文件中，如果 AOF 重写正在进行，那么也将命令追加到 AOF 重写缓存中。
+void aofRemoveTempFile(pid_t childpid);//删除 AOF 重写所产生的临时文件
+int rewriteAppendOnlyFileBackground(void);//刷新缓存区的内容到磁盘中
+int loadAppendOnlyFile(char *filename);//执行 AOF 文件中的命令。
+void stopAppendOnly(void);//在用户通过 CONFIG 命令在运行时关闭 AOF 持久化时调用
+int startAppendOnly(void);//当用户在运行时使用 CONFIG 命令，从 appendonly no 切换到 appendonly yes 时执行
+void backgroundRewriteDoneHandler(int exitcode, int bysignal);//当子线程完成 AOF 重写时，父进程调用这个函数。
+void aofRewriteBufferReset(void);//清空 AOF 缓冲区
+unsigned long aofRewriteBufferSize(void);//返回 AOF 重写缓存当前的大小
 
 /* Sorted sets data type */
 
