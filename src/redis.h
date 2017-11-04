@@ -1768,86 +1768,86 @@ void resetServerStats(void);//重新设置通过INFO或其他方式公开的数�
 unsigned int getLRUClock(void);//获取当前系统的毫秒数
 
 /* Set data type */
-robj *setTypeCreate(robj *value);
-int setTypeAdd(robj *subject, robj *value);
-int setTypeRemove(robj *subject, robj *value);
-int setTypeIsMember(robj *subject, robj *value);
-setTypeIterator *setTypeInitIterator(robj *subject);
-void setTypeReleaseIterator(setTypeIterator *si);
-int setTypeNext(setTypeIterator *si, robj **objele, int64_t *llele);
-robj *setTypeNextObject(setTypeIterator *si);
-int setTypeRandomElement(robj *setobj, robj **objele, int64_t *llele);
-unsigned long setTypeSize(robj *subject);
-void setTypeConvert(robj *subject, int enc);
+robj *setTypeCreate(robj *value);//返回一个可以保存值 value 的集合。
+int setTypeAdd(robj *subject, robj *value);//多态 add 操作
+int setTypeRemove(robj *subject, robj *value);//多态 remove 操作
+int setTypeIsMember(robj *subject, robj *value);//多态 ismember 操作
+setTypeIterator *setTypeInitIterator(robj *subject);//创建并返回一个多态集合迭代器
+void setTypeReleaseIterator(setTypeIterator *si);//释放迭代器
+int setTypeNext(setTypeIterator *si, robj **objele, int64_t *llele);//取出被迭代器指向的当前集合元素。
+robj *setTypeNextObject(setTypeIterator *si);//在非 copy-on-write 时调用
+int setTypeRandomElement(robj *setobj, robj **objele, int64_t *llele);//从非空集合中随机取出一个元素。
+unsigned long setTypeSize(robj *subject);//集合多态 size 函数
+void setTypeConvert(robj *subject, int enc);//将集合对象 setobj 的编码转换为 REDIS_ENCODING_HT 。
 
 /* Hash data type */
-void hashTypeConvert(robj *o, int enc);
-void hashTypeTryConversion(robj *subject, robj **argv, int start, int end);
-void hashTypeTryObjectEncoding(robj *subject, robj **o1, robj **o2);
-robj *hashTypeGetObject(robj *o, robj *key);
-int hashTypeExists(robj *o, robj *key);
-int hashTypeSet(robj *o, robj *key, robj *value);
-int hashTypeDelete(robj *o, robj *key);
-unsigned long hashTypeLength(robj *o);
-hashTypeIterator *hashTypeInitIterator(robj *subject);
-void hashTypeReleaseIterator(hashTypeIterator *hi);
-int hashTypeNext(hashTypeIterator *hi);
+void hashTypeConvert(robj *o, int enc);//将一个 ziplist 编码的哈希对象 o 转换成其他编码
+void hashTypeTryConversion(robj *subject, robj **argv, int start, int end);//对 argv 数组中的多个对象进行检查，看是否需要将对象的编码从 REDIS_ENCODING_ZIPLIST 转换成 REDIS_ENCODING_HT
+void hashTypeTryObjectEncoding(robj *subject, robj **o1, robj **o2);//当 subject 的编码为 REDIS_ENCODING_HT 时，尝试对对象 o1 和 o2 进行编码，以节省更多内存。
+robj *hashTypeGetObject(robj *o, robj *key);//多态 GET 函数，从 hash 中取出域 field 的值，并返回一个值对象。
+int hashTypeExists(robj *o, robj *key);//检查给定域 feild 是否存在于 hash 对象 o 中。
+int hashTypeSet(robj *o, robj *key, robj *value);//这个函数负责对 field 和 value 参数进行引用计数自增。
+int hashTypeDelete(robj *o, robj *key);//将给定 field 及其 value 从哈希表中删除
+unsigned long hashTypeLength(robj *o);//返回哈希表的 field-value 对数量
+hashTypeIterator *hashTypeInitIterator(robj *subject);//创建一个哈希类型的迭代器
+void hashTypeReleaseIterator(hashTypeIterator *hi);//释放迭代器
+int hashTypeNext(hashTypeIterator *hi);//获取哈希中的下一个节点，并将它保存到迭代器。
 void hashTypeCurrentFromZiplist(hashTypeIterator *hi, int what,
                                 unsigned char **vstr,
                                 unsigned int *vlen,
-                                long long *vll);
-void hashTypeCurrentFromHashTable(hashTypeIterator *hi, int what, robj **dst);
-robj *hashTypeCurrentObject(hashTypeIterator *hi, int what);
-robj *hashTypeLookupWriteOrCreate(redisClient *c, robj *key);
+                                long long *vll);//从 ziplist 编码的哈希中，取出迭代器指针当前指向节点的域或值。
+void hashTypeCurrentFromHashTable(hashTypeIterator *hi, int what, robj **dst);//根据迭代器的指针，从字典编码的哈希中取出所指向节点的 field 或者 value 。
+robj *hashTypeCurrentObject(hashTypeIterator *hi, int what);//一个非 copy-on-write 友好，但是层次更高的 hashTypeCurrent() 函数，这个函数返回一个增加了引用计数的对象，或者一个新对象。
+robj *hashTypeLookupWriteOrCreate(redisClient *c, robj *key);//按 key 在数据库中查找并返回相应的哈希对象，如果对象不存在，那么创建一个新哈希对象并返回。
 
 /* Pub / Sub */
-int pubsubUnsubscribeAllChannels(redisClient *c, int notify);
-int pubsubUnsubscribeAllPatterns(redisClient *c, int notify);
-void freePubsubPattern(void *p);
-int listMatchPubsubPattern(void *a, void *b);
-int pubsubPublishMessage(robj *channel, robj *message);
+int pubsubUnsubscribeAllChannels(redisClient *c, int notify);//退订客户端 c 订阅的所有频道。
+int pubsubUnsubscribeAllPatterns(redisClient *c, int notify);//退订客户端 c 订阅的所有模式。
+void freePubsubPattern(void *p);//释放给定的模式 p
+int listMatchPubsubPattern(void *a, void *b);//对比模式 a 和 b 是否相同，相同返回 1 ，不相同返回 0 。
+int pubsubPublishMessage(robj *channel, robj *message);//将 message 发送到所有订阅频道 channel 的客户端，以及所有订阅了和 channel 频道匹配的模式的客户端。
 
 /* Keyspace events notification */
-void notifyKeyspaceEvent(int type, char *event, robj *key, int dbid);
-int keyspaceEventsStringToFlags(char *classes);
-sds keyspaceEventsFlagsToString(int flags);
+void notifyKeyspaceEvent(int type, char *event, robj *key, int dbid);//向Redis核心提供一个简单的API函数
+int keyspaceEventsStringToFlags(char *classes);//对传入的字符串参数进行分析， 给出相应的 flags 值
+sds keyspaceEventsFlagsToString(int flags);//根据 flags 值还原设置这个 flags 所需的字符串
 
 /* Configuration */
-void loadServerConfig(char *filename, char *options);
-void appendServerSaveParams(time_t seconds, int changes);
-void resetServerSaveParams();
-struct rewriteConfigState; /* Forward declaration to export API. */
-void rewriteConfigRewriteLine(struct rewriteConfigState *state, char *option, sds line, int force);
-int rewriteConfig(char *path);
+void loadServerConfig(char *filename, char *options);//从给定文件中载入服务器配置。
+void appendServerSaveParams(time_t seconds, int changes);//追加server save参数
+void resetServerSaveParams();//重置server的save参数，即释放server的serverParams
+struct rewriteConfigState; /* Forward declaration to export API. 存了属性配置的字符串数组，一个字符串数组代表一种属性设置*/
+void rewriteConfigRewriteLine(struct rewriteConfigState *state, char *option, sds line, int force);//是否覆盖configline
+int rewriteConfig(char *path);//将当前的属性读入到文件中，步骤:(1).将当前server属性读入configstate(2).configstate属性变为字符串(3).将字符串写入文件
 
 /* db.c -- Keyspace access API */
-int removeExpire(redisDb *db, robj *key);
-void propagateExpire(redisDb *db, robj *key);
-int expireIfNeeded(redisDb *db, robj *key);
-long long getExpire(redisDb *db, robj *key);
-void setExpire(redisDb *db, robj *key, long long when);
-robj *lookupKey(redisDb *db, robj *key);
-robj *lookupKeyRead(redisDb *db, robj *key);
-robj *lookupKeyWrite(redisDb *db, robj *key);
-robj *lookupKeyReadOrReply(redisClient *c, robj *key, robj *reply);
-robj *lookupKeyWriteOrReply(redisClient *c, robj *key, robj *reply);
-void dbAdd(redisDb *db, robj *key, robj *val);
-void dbOverwrite(redisDb *db, robj *key, robj *val);
-void setKey(redisDb *db, robj *key, robj *val);
-int dbExists(redisDb *db, robj *key);
-robj *dbRandomKey(redisDb *db);
-int dbDelete(redisDb *db, robj *key);
-robj *dbUnshareStringValue(redisDb *db, robj *key, robj *o);
-long long emptyDb(void(callback)(void*));
-int selectDb(redisClient *c, int id);
-void signalModifiedKey(redisDb *db, robj *key);
-void signalFlushedDb(int dbid);
-unsigned int getKeysInSlot(unsigned int hashslot, robj **keys, unsigned int count);
-unsigned int countKeysInSlot(unsigned int hashslot);
-unsigned int delKeysInSlot(unsigned int hashslot);
-int verifyClusterConfigWithData(void);
-void scanGenericCommand(redisClient *c, robj *o, unsigned long cursor);
-int parseScanCursorOrReply(redisClient *c, robj *o, unsigned long *cursor);
+int removeExpire(redisDb *db, robj *key);//移除键 key 的过期时间
+void propagateExpire(redisDb *db, robj *key);//将过期时间传播到附属节点和 AOF 文件。
+int expireIfNeeded(redisDb *db, robj *key);//检查 key 是否已经过期，如果是的话，将它从数据库中删除。
+long long getExpire(redisDb *db, robj *key);//返回给定 key 的过期时间。
+void setExpire(redisDb *db, robj *key, long long when);//将键 key 的过期时间设为 when
+robj *lookupKey(redisDb *db, robj *key);//从数据库 db 中取出键 key 的值（对象）,如果 key 的值存在，那么返回该值；否则，返回 NULL 。
+robj *lookupKeyRead(redisDb *db, robj *key);//为执行读取操作而取出键 key 在数据库 db 中的值。
+robj *lookupKeyWrite(redisDb *db, robj *key);//为执行写入操作而取出键 key 在数据库 db 中的值。
+robj *lookupKeyReadOrReply(redisClient *c, robj *key, robj *reply);//为执行读取操作而从数据库中查找返回 key 的值。
+robj *lookupKeyWriteOrReply(redisClient *c, robj *key, robj *reply);//为执行写入操作而从数据库中查找返回 key 的值。
+void dbAdd(redisDb *db, robj *key, robj *val);//尝试将键值对 key 和 val 添加到数据库中。
+void dbOverwrite(redisDb *db, robj *key, robj *val);//为已存在的键关联一个新值。
+void setKey(redisDb *db, robj *key, robj *val);//高层次的 SET 操作函数。这个函数可以在不管键 key 是否存在的情况下，将它和 val 关联起来。
+int dbExists(redisDb *db, robj *key);//检查键 key 是否存在于数据库中，存在返回 1 ，不存在返回 0 。
+robj *dbRandomKey(redisDb *db);//随机从数据库中取出一个键，并以字符串对象的方式返回这个键。
+int dbDelete(redisDb *db, robj *key);//从数据库中删除给定的键，键的值，以及键的过期时间。
+robj *dbUnshareStringValue(redisDb *db, robj *key, robj *o);//将string对象的内部编码转成OBJ_ENCODING_RAW的（只有这种编码的robj对象，其内部的sds 才能在后面自由追加新的内容），并解除可能存在的对象共享状态。
+long long emptyDb(void(callback)(void*));//清空服务器的所有数据。
+int selectDb(redisClient *c, int id);//将客户端的目标数据库切换为 id 所指定的数据库
+void signalModifiedKey(redisDb *db, robj *key);//键空间改动的钩子。
+void signalFlushedDb(int dbid);//把dbid中的key都touch一遍
+unsigned int getKeysInSlot(unsigned int hashslot, robj **keys, unsigned int count);//记录 count 个属于 hashslot 槽的键到 keys 数组，并返回被记录键的数量
+unsigned int countKeysInSlot(unsigned int hashslot);//返回指定 slot 包含的键数量
+unsigned int delKeysInSlot(unsigned int hashslot);//删除指定哈希槽中的所有键。已删除的项的数量被返回。
+int verifyClusterConfigWithData(void);//检查当前节点的节点配置是否正确，包含的数据是否正确,在启动集群时被调用（看 redis.c ）
+void scanGenericCommand(redisClient *c, robj *o, unsigned long cursor);//这是 SCAN 、 HSCAN 、 SSCAN 命令的实现函数。
+int parseScanCursorOrReply(redisClient *c, robj *o, unsigned long *cursor);//尝试解析存储在对象“o”中的扫描光标:如果光标是有效的，将它存储为无符号整数，然后返回redisok。否则返回REDIS_ERR并向客户机发送错误。
 
 /* API to get key arguments from commands */
 int *getKeysFromCommand(struct redisCommand *cmd, robj **argv, int argc, int *numkeys);
