@@ -1850,46 +1850,46 @@ void scanGenericCommand(redisClient *c, robj *o, unsigned long cursor);//这是 
 int parseScanCursorOrReply(redisClient *c, robj *o, unsigned long *cursor);//尝试解析存储在对象“o”中的扫描光标:如果光标是有效的，将它存储为无符号整数，然后返回redisok。否则返回REDIS_ERR并向客户机发送错误。
 
 /* API to get key arguments from commands */
-int *getKeysFromCommand(struct redisCommand *cmd, robj **argv, int argc, int *numkeys);
-void getKeysFreeResult(int *result);
-int *zunionInterGetKeys(struct redisCommand *cmd,robj **argv, int argc, int *numkeys);
-int *evalGetKeys(struct redisCommand *cmd, robj **argv, int argc, int *numkeys);
-int *sortGetKeys(struct redisCommand *cmd, robj **argv, int argc, int *numkeys);
+int *getKeysFromCommand(struct redisCommand *cmd, robj **argv, int argc, int *numkeys);//如果不需要特定于命令的助手函数，则该函数使用命令表，否则它将调用特定于命令的函数。
+void getKeysFreeResult(int *result);//释放getKeysFromCommand的结果
+int *zunionInterGetKeys(struct redisCommand *cmd,robj **argv, int argc, int *numkeys);//帮助函数从命令中提取键
+int *evalGetKeys(struct redisCommand *cmd, robj **argv, int argc, int *numkeys);//帮助函数从命令中提取键
+int *sortGetKeys(struct redisCommand *cmd, robj **argv, int argc, int *numkeys);//帮助函数从排序命令中提取密钥
 
 /* Cluster */
-void clusterInit(void);
-unsigned short crc16(const char *buf, int len);
-unsigned int keyHashSlot(char *key, int keylen);
-void clusterCron(void);
-void clusterPropagatePublish(robj *channel, robj *message);
-void migrateCloseTimedoutSockets(void);
-void clusterBeforeSleep(void);
+void clusterInit(void);//初始化集群
+unsigned short crc16(const char *buf, int len);//???
+unsigned int keyHashSlot(char *key, int keylen);//计算给定键应该被分配到那个槽
+void clusterCron(void);//集群常规操作函数，默认每秒执行 10 次（每间隔 100 毫秒执行一次）
+void clusterPropagatePublish(robj *channel, robj *message);//向整个集群的 channel 频道中广播消息 messages
+void migrateCloseTimedoutSockets(void);//移除过期的连接，由 redis.c/serverCron() 调用
+void clusterBeforeSleep(void);//在进入下个事件循环时调用。这个函数做的事都是需要尽快执行，但是不能在执行文件事件期间做的事情。
 
 /* Sentinel */
-void initSentinelConfig(void);
-void initSentinel(void);
-void sentinelTimer(void);
-char *sentinelHandleConfiguration(char **argv, int argc);
-void sentinelIsRunning(void);
+void initSentinelConfig(void);//这个函数会用 Sentinel 所属的属性覆盖服务器默认的属性
+void initSentinel(void);//以 Sentinel 模式初始化服务器
+void sentinelTimer(void);//sentinel 模式的主函数，由 redis.c/serverCron 函数调用
+char *sentinelHandleConfiguration(char **argv, int argc);//Sentinel 配置文件分析器
+void sentinelIsRunning(void);//这个函数在 Sentinel 准备就绪，可以执行操作时执行
 
 /* Scripting */
-void scriptingInit(void);
+void scriptingInit(void);//初始化环境
 
 /* Blocked clients */
-void processUnblockedClients(void);
-void blockClient(redisClient *c, int btype);
-void unblockClient(redisClient *c);
-void replyToBlockedClientTimedOut(redisClient *c);
-int getTimeoutFromObjectOrReply(redisClient *c, robj *object, mstime_t *timeout, int unit);
+void processUnblockedClients(void);//取消所有在 unblocked_clients 链表中的客户端的阻塞状态
+void blockClient(redisClient *c, int btype);//对给定的客户端进行阻塞
+void unblockClient(redisClient *c);//取消给定的客户端的阻塞状态
+void replyToBlockedClientTimedOut(redisClient *c);//等待超时，向被阻塞的客户端返回通知
+int getTimeoutFromObjectOrReply(redisClient *c, robj *object, mstime_t *timeout, int unit);//根据输入参数，取出最大等待时间
 
 /* Git SHA1 */
-char *redisGitSHA1(void);
-char *redisGitDirty(void);
-uint64_t redisBuildId(void);
+char *redisGitSHA1(void);//??
+char *redisGitDirty(void);//??
+uint64_t redisBuildId(void);//??
 
 /* Commands prototypes */
-void authCommand(redisClient *c);
-void pingCommand(redisClient *c);
+void authCommand(redisClient *c);//密码验证信息
+void pingCommand(redisClient *c);//ping 命令处理函数
 void echoCommand(redisClient *c);
 void setCommand(redisClient *c);
 void setnxCommand(redisClient *c);
@@ -2045,8 +2045,8 @@ void pfmergeCommand(redisClient *c);
 void pfdebugCommand(redisClient *c);
 
 #if defined(__GNUC__)
-void *calloc(size_t count, size_t size) __attribute__ ((deprecated));
-void free(void *ptr) __attribute__ ((deprecated));
+void *calloc(size_t count, size_t size) __attribute__ ((deprecated));//在内存的动态存储区中分配n个长度为size的连续空间，函数返回一个指向分配起始地址的指针；如果分配不成功，返回NULL。
+void free(void *ptr) __attribute__ ((deprecated));//释放
 void *malloc(size_t size) __attribute__ ((deprecated));
 void *realloc(void *ptr, size_t size) __attribute__ ((deprecated));
 #endif
