@@ -2052,17 +2052,17 @@ void *realloc(void *ptr, size_t size) __attribute__ ((deprecated));
 #endif
 
 /* Debugging stuff */
-void _redisAssertWithInfo(redisClient *c, robj *o, char *estr, char *file, int line);
-void _redisAssert(char *estr, char *file, int line);
-void _redisPanic(char *msg, char *file, int line);
-void bugReportStart(void);
-void redisLogObjectDebugInfo(robj *o);
-void sigsegvHandler(int sig, siginfo_t *info, void *secret);
-sds genRedisInfoString(char *section);
-void enableWatchdog(int period);
-void disableWatchdog(void);
-void watchdogScheduleSignal(int period);
-void redisLogHexDump(int level, char *descr, void *value, size_t len);
+void _redisAssertWithInfo(redisClient *c, robj *o, char *estr, char *file, int line);//函数会打印 Redis 服务器当前服务的客户端和某个关键 Redis 对象的信息
+void _redisAssert(char *estr, char *file, int line);//应急处理
+void _redisPanic(char *msg, char *file, int line);//???
+void bugReportStart(void);//????
+void redisLogObjectDebugInfo(robj *o);//???
+void sigsegvHandler(int sig, siginfo_t *info, void *secret);//????
+sds genRedisInfoString(char *section);//创建由INFO命令返回的字符串。这是由INFO命令本身解耦的，因为我们需要在内存损坏问题上报告相同的信息。
+void enableWatchdog(int period);//允许软件监视程序以毫秒为单位指定周期。
+void disableWatchdog(void);//禁用软件监视程序。
+void watchdogScheduleSignal(int period);//在指定的周期后以毫秒为单位安排一个SIGALRM交付。如果计时器已经安排好了，这个函数将重新安排到指定的时间。如果周期为0，则当前计时器禁用。
+void redisLogHexDump(int level, char *descr, void *value, size_t len);//日志记录功能调试
 
 #define redisDebug(fmt, ...) \
     printf("DEBUG %s:%d > " fmt "\n", __FILE__, __LINE__, __VA_ARGS__)
