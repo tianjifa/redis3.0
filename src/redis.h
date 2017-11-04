@@ -1732,40 +1732,40 @@ double zzlGetScore(unsigned char *sptr);//取出 sptr 指向节点所保存的�
 void zzlNext(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);//根据 eptr 和 sptr ，移动它们分别指向下个成员和下个分值。
 void zzlPrev(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);//根据 eptr 和 sptr 的值，移动指针指向前一个节点。
 unsigned int zsetLength(robj *zobj);//通用排序集API
-void zsetConvert(robj *zobj, int encoding);
-unsigned long zslGetRank(zskiplist *zsl, double score, robj *o);
+void zsetConvert(robj *zobj, int encoding);//将跳跃表对象 zobj 的底层编码转换为 encoding 。
+unsigned long zslGetRank(zskiplist *zsl, double score, robj *o);//查找包含给定分值和成员对象的节点在跳跃表中的排位。
 
 /* Core functions */
-int freeMemoryIfNeeded(void);
-int processCommand(redisClient *c);
-void setupSignalHandlers(void);
-struct redisCommand *lookupCommand(sds name);
-struct redisCommand *lookupCommandByCString(char *s);
-struct redisCommand *lookupCommandOrOriginal(sds name);
-void call(redisClient *c, int flags);
-void propagate(struct redisCommand *cmd, int dbid, robj **argv, int argc, int flags);
-void alsoPropagate(struct redisCommand *cmd, int dbid, robj **argv, int argc, int target);
-void forceCommandPropagation(redisClient *c, int flags);
-int prepareForShutdown();
+int freeMemoryIfNeeded(void);//淘汰机制触发的函数
+int processCommand(redisClient *c);//这个函数执行时，我们已经读入了一个完整的命令到客户端，这个函数负责执行这个命令，或者服务器准备从客户端中进行一次读取。
+void setupSignalHandlers(void);//建立信号处理函数
+struct redisCommand *lookupCommand(sds name);//根据给定命令名字（SDS），查找命令
+struct redisCommand *lookupCommandByCString(char *s);//根据给定命令名字（C 字符串），查找命令
+struct redisCommand *lookupCommandOrOriginal(sds name);//从当前命令表 server.commands 中查找给定名字，如果没找到的话，就尝试从 server.orig_commands 中查找未被改名的原始名字,原始表中的命令名不受 redis.conf 中命令改名的影响
+void call(redisClient *c, int flags);//调用命令的实现函数，执行命令
+void propagate(struct redisCommand *cmd, int dbid, robj **argv, int argc, int flags);//将过期时间传播到附属节点和 AOF 文件
+void alsoPropagate(struct redisCommand *cmd, int dbid, robj **argv, int argc, int target);//使用内部命令在当前命令传播到AOF / Replication后调度附加命令的传播。
+void forceCommandPropagation(redisClient *c, int flags);//强制将特定命令执行的传播引入到AOF / Replication中。
+int prepareForShutdown();//????
 #ifdef __GNUC__
 void redisLog(int level, const char *fmt, ...)
-    __attribute__((format(printf, 2, 3)));
+    __attribute__((format(printf, 2, 3)));//将给定的数据写入日志文件，和常用的printf 函数用法差不多
 #else
 void redisLog(int level, const char *fmt, ...);
 #endif
-void redisLogRaw(int level, const char *msg);
-void redisLogFromHandler(int level, const char *msg);
-void usage();
-void updateDictResizePolicy(void);
-int htNeedsResize(dict *dict);
-void oom(const char *msg);
-void populateCommandTable(void);
-void resetCommandTableStats(void);
-void adjustOpenFilesLimit(void);
-void closeListeningSockets(int unlink_unix_socket);
-void updateCachedTime(void);
-void resetServerStats(void);
-unsigned int getLRUClock(void);
+void redisLogRaw(int level, const char *msg);//低水level志记录。仅用于非常大的消息，否则redisLog()就是喜欢。
+void redisLogFromHandler(int level, const char *msg);//以一种安全的方式从一个信号处理程序中调用一个固定的消息，而不需要任何类似于打印的功能。
+void usage();//???
+void updateDictResizePolicy(void);//这个函数被称为某个类型的后台进程，因为我们希望避免在有子的时候调整哈希表，以便在编写时能够很好地发挥作用(否则，当有大量内存分页被复制时)。这个函数的目标是更新dict . c的能力来调整哈希表的大小，从而使我们没有运行childs。
+int htNeedsResize(dict *dict);//判断是否可以需要进行dict缩小的条件判断,填充率必须>10%，否则会进行缩小
+void oom(const char *msg);//???
+void populateCommandTable(void);//根据 redis.c 文件顶部的命令列表，创建命令表
+void resetCommandTableStats(void);//重置命令表中的统计信息
+void adjustOpenFilesLimit(void);//此函数将尝试根据客户端配置最大数量的打开文件。它还保留了一些文件描述符(REDIS_MIN_RESERVED_FDS)，用于额外的持久性、监听套接字、日志文件等等。
+void closeListeningSockets(int unlink_unix_socket);//关闭监听套接字
+void updateCachedTime(void);//我们在全局状态中获取了unix时间的缓存值，因为有了虚拟内存和老化，就可以将当前时间存储在每个对象访问的对象中，并且不需要精度。访问全局变量比调用时间(NULL)要快得多。
+void resetServerStats(void);//重新设置通过INFO或其他方式公开的数据，我们希望通过配置RESETSTAT来重置。该函数还用于在服务器启动时在initServer()中初始化这些字段。
+unsigned int getLRUClock(void);//获取当前系统的毫秒数
 
 /* Set data type */
 robj *setTypeCreate(robj *value);
