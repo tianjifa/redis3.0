@@ -1,10 +1,102 @@
+------------------------------------------
 Server:
 redis-server
 	adlist.o 双端链表实现
+		------------------------------------
+		list *listCreate(void);//创建一个新的链表
+		void listRelease(list *list);//释放整个链表，以及链表中所有节点
+		list *listAddNodeHead(list *list, void *value);//将一个包含有给定值指针 value 的新节点添加到链表的表头
+		list *listAddNodeTail(list *list, void *value);//将一个包含有给定值指针 value 的新节点添加到链表的表尾
+		list *listInsertNode(list *list, listNode *old_node, void *value, int after);//创建一个包含值 value 的新节点，并将它插入到 old_node 的之前或之后
+		void listDelNode(list *list, listNode *node);//从链表 list 中删除给定节点 node
+		listIter *listGetIterator(list *list, int direction);//为给定链表创建一个迭代器，之后每次对这个迭代器调用 listNext 都返回被迭代到的链表节点
+		listNode *listNext(listIter *iter);//返回迭代器当前所指向的节点。
+		void listReleaseIterator(listIter *iter);//释放迭代器
+		list *listDup(list *orig);//复制整个链表。
+		listNode *listSearchKey(list *list, void *key);//查找链表 list 中值和 key 匹配的节点。
+		listNode *listIndex(list *list, long index);//返回链表在给定索引上的值。
+		void listRewind(list *list, listIter *li);//将迭代器的方向设置为 AL_START_HEAD，并将迭代指针重新指向表头节点。
+		void listRewindTail(list *list, listIter *li);//将迭代器的方向设置为 AL_START_TAIL，并将迭代指针重新指向表尾节点。
+		void listRotate(list *list);//取出链表的表尾节点，并将它移动到表头，成为新的表头节点。
+		------------------------------------
 	ae.o 
+		------------------------------------
+		aeEventLoop *aeCreateEventLoop(int setsize);//初始化事件处理器状态
+		void aeDeleteEventLoop(aeEventLoop *eventLoop);//删除事件处理器
+		void aeStop(aeEventLoop *eventLoop);//停止事件处理器
+		int aeCreateFileEvent(aeEventLoop *eventLoop, int fd, int mask,aeFileProc *proc, void *clientData);//根据 mask 参数的值，监听 fd 文件的状态，当 fd 可用时，执行 proc 函数				
+		void aeDeleteFileEvent(aeEventLoop *eventLoop, int fd, int mask);//将 fd 从 mask 指定的监听队列中删除
+		int aeGetFileEvents(aeEventLoop *eventLoop, int fd);//获取给定 fd 正在监听的事件类型
+		long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,aeTimeProc *proc, void *clientData,aeEventFinalizerProc *finalizerProc);//创建时间事件		
+		int aeDeleteTimeEvent(aeEventLoop *eventLoop, long long id);//删除给定 id 的时间事件
+		int aeProcessEvents(aeEventLoop *eventLoop, int flags);//处理所有已到达的时间事件，以及所有已就绪的文件事件。
+		int aeWait(int fd, int mask, long long milliseconds);//在给定毫秒内等待，直到 fd 变成可写、可读或异常
+		void aeMain(aeEventLoop *eventLoop);//事件处理器的主循环
+		char *aeGetApiName(void);//返回所使用的多路复用库的名称
+		void aeSetBeforeSleepProc(aeEventLoop *eventLoop, aeBeforeSleepProc *beforesleep);//设置处理事件前需要被执行的函数
+		int aeGetSetSize(aeEventLoop *eventLoop);//返回当前事件槽大小
+		int aeResizeSetSize(aeEventLoop *eventLoop, int setsize);//调整事件槽的大小
+		------------------------------------
 	anet.o 
+		------------------------------------
+		int anetTcpConnect(char *err, char *addr, int port);//创建阻塞 TCP 连接
+		int anetTcpNonBlockConnect(char *err, char *addr, int port);//创建非阻塞 TCP 连接
+		int anetTcpNonBlockBindConnect(char *err, char *addr, int port, char *source_addr);//创建非阻塞 TCP 连接
+		int anetUnixConnect(char *err, char *path);//创建阻塞本地连接
+		int anetUnixNonBlockConnect(char *err, char *path);//创建非阻塞本地连接
+		int anetRead(int fd, char *buf, int count);//带 short count 处理的读取函数
+		int anetResolve(char *err, char *host, char *ipbuf, size_t ipbuf_len);//解析所有的东西
+		int anetResolveIP(char *err, char *host, char *ipbuf, size_t ipbuf_len);//单单解析IP的地址
+		int anetTcpServer(char *err, int port, char *bindaddr, int backlog);//创建socket的server
+		int anetTcp6Server(char *err, int port, char *bindaddr, int backlog);//创建只能发送和接收ipv6的socket的server
+		int anetUnixServer(char *err, char *path, mode_t perm, int backlog);//创建unix域的的socket的server
+		int anetTcpAccept(char *err, int serversock, char *ip, size_t ip_len, int *port);//获得tcp连接请求并建立连接
+		int anetUnixAccept(char *err, int serversock);//获得unix域连接请求并建立连接
+		int anetWrite(int fd, char *buf, int count);//对write()的简单封装
+		int anetNonBlock(char *err, int fd);//将 fd 设置为非阻塞模式（O_NONBLOCK）
+		int anetEnableTcpNoDelay(char *err, int fd);//禁用 Nagle 算法
+		int anetDisableTcpNoDelay(char *err, int fd);//启用 Nagle 算法
+		int anetTcpKeepAlive(char *err, int fd);//开启 TCP 的 keep alive 选项
+		int anetPeerToString(int fd, char *ip, size_t ip_len, int *port);//获取连接客户端的 IP 和端口号
+		int anetKeepAlive(char *err, int fd, int interval);//修改 TCP 连接的 keep alive 选项
+		int anetSockName(int fd, char *ip, size_t ip_len, int *port);//获取服务器本机的 IP 和端口号
+		------------------------------------
 	dict.o 字典实现
+		------------------------------------
+		dict *dictCreate(dictType *type, void *privDataPtr);//创建一个新的字典
+		int dictExpand(dict *d, unsigned long size);//调整字典的大小
+		int dictAdd(dict *d, void *key, void *val);//尝试将给定键值对添加到字典中
+		dictEntry *dictAddRaw(dict *d, void *key);//如果键不存在，那么程序创建新的哈希节点，将节点和键关联，并插入到字典，然后返回节点本身。
+		int dictReplace(dict *d, void *key, void *val);//将给定的键值对添加到字典中，如果键已经存在，那么删除旧有的键值对。
+		dictEntry *dictReplaceRaw(dict *d, void *key);//不论发生以上的哪一种情况,dictAddRaw() 都总是返回包含给定 key 的字典节点。
+		int dictDelete(dict *d, const void *key);//从字典中删除包含给定键的节点,并且调用键值的释放函数来删除键值
+		int dictDeleteNoFree(dict *d, const void *key);//从字典中删除包含给定键的节点,但不调用键值的释放函数来删除键值
+		void dictRelease(dict *d);//删除并释放整个字典
+		dictEntry * dictFind(dict *d, const void *key);//返回字典中包含键 key 的节点,找到返回节点，找不到返回 NULL
+		void *dictFetchValue(dict *d, const void *key);//获取包含给定键的节点的值
+		int dictResize(dict *d);//缩小给定字典,让它的已用节点数和字典大小之间的比率接近 1:1
+		dictIterator *dictGetIterator(dict *d);//创建并返回给定字典的不安全迭代器
+		dictIterator *dictGetSafeIterator(dict *d);//创建并返回给定节点的安全迭代器
+		dictEntry *dictNext(dictIterator *iter);//返回迭代器指向的当前节点
+		void dictReleaseIterator(dictIterator *iter);//释放给定字典迭代器
+		dictEntry *dictGetRandomKey(dict *d);//随机返回字典中任意一个节点。
+		int dictGetRandomKeys(dict *d, dictEntry **des, int count);//这是一个版本的命令行命令，它被修改，以返回多个条目，在哈希表的随机位置跳跃，并对条目进行线性扫描。
+		void dictPrintStats(dict *d);//打印字典当前状态
+		unsigned int dictGenHashFunction(const void *key, int len);//MurmurHash2哈希算法的实现，根据key值和指定长度进行哈希
+		unsigned int dictGenCaseHashFunction(const unsigned char *buf, int len);//一种比较简单的哈希算法，也是对字符串进行哈希的
+		void dictEmpty(dict *d, void(callback)(void*));//清空字典数据但不释放空间 
+		void dictEnableResize(void);//可以手动地允许哈希表进行 rehash ，这在 Redis 使用子进程进行保存操作时，可以有效地利用 copy-on-write 机制。
+		void dictDisableResize(void);//可以手动地阻止哈希表进行 rehash ，这在 Redis 使用子进程进行保存操作时，可以有效地利用 copy-on-write 机制。
+		int dictRehash(dict *d, int n);//执行 N 步渐进式 rehash 。
+		int dictRehashMilliseconds(dict *d, int ms);//在给定毫秒数内，以 100 步为单位，对字典进行 rehash 
+		void dictSetHashFunctionSeed(unsigned int initval);//设置hash种子
+		unsigned int dictGetHashFunctionSeed(void);//获取hash种子
+		unsigned long dictScan(dict *d, unsigned long v, dictScanFunction *fn, void *privdata);//函数用于迭代给定字典中的元素。
+		------------------------------------
 	redis.o 
+		------------------------------------
+		pending.....
+		------------------------------------
 	sds.o 动态字符串实现
 		------------------------------------
 		sdsnewlen()创建一个指定长度的sds，接受一个指定的C字符串作为初始化值 O(N)
@@ -28,53 +120,313 @@ redis-server
 		sdssplitlen()对给定的字符串s按照给定的sep分隔字符串来进行切割
 		------------------------------------
 	zmalloc.o 
+		------------------------------------
+		void *zmalloc(size_t size);//申请size大bytes的内存区域
+		void *zcalloc(size_t size);//申请size个sizeof(byte)大的内存区域
+		void *zrealloc(void *ptr, size_t size);//重新分配size大小的内存
+		void zfree(void *ptr);//释放ptr开始内存块，与zmalloc,zcalloc,zrealloc配对
+		char *zstrdup(const char *s);//复制字符串
+		size_t zmalloc_used_memory(void);//得到已申请内存块总大小
+		void zmalloc_enable_thread_safeness(void);//设置线程安全zmalloc开关，即操作前lock
+		void zmalloc_set_oom_handler(void (*oom_handler)(size_t));//可自定义设置内存溢出的处理方法
+		float zmalloc_get_fragmentation_ratio(size_t rss);//所给大小与已使用内存大小之比
+		size_t zmalloc_get_rss(void);//用来获取进程的RSS(Resident Set Size，指实际使用物理内存,包含共享库占用的内存)
+		size_t zmalloc_get_private_dirty(void);//获取私有的脏数据大小
+		void zlibc_free(void *ptr);//原始系统free释放方法
+		------------------------------------
 	lzf_c.o 
+		------------------------------------
+		pending...
+		------------------------------------
 	lzf_d.o 
-	pqsort.o 
-	zipmap.o 
+		------------------------------------
+		pending...
+		------------------------------------
+	pqsort.o
+		------------------------------------
+		void pqsort(void *a, size_t n, size_t es,int (*cmp) (const void *, const void *), size_t lrange, size_t rrange);//部分快速排序算法,只对一个数字序列的一部分进行排序
+		------------------------------------	
+	zipmap.o
+		------------------------------------
+		unsigned char *zipmapNew(void);//创建一个新的zipmap，这个空zipmap占用2个byte的内存空间
+		unsigned char *zipmapSet(unsigned char *zm, unsigned char *key, unsigned int klen, unsigned char *val, unsigned int vlen, int *update);//加入新的key/value或者修改zipmap中已有key对应的value.
+		unsigned char *zipmapDel(unsigned char *zm, unsigned char *key, unsigned int klen, int *deleted);//从zipmap中删除key/value
+		unsigned char *zipmapRewind(unsigned char *zm);//在通过 zipmapNext 遍历 zipmap 之前调用,返回指向 zipmap 首个节点的指针。
+		unsigned char *zipmapNext(unsigned char *zm, unsigned char **key, unsigned int *klen, unsigned char **value, unsigned int *vlen);//这个函数用于遍历 zipmap 的所有元素。
+		int zipmapGet(unsigned char *zm, unsigned char *key, unsigned int klen, unsigned char **value, unsigned int *vlen);//在 zipmap 中按 key 进行查找，将值的指针保存到 *value 中，并将值的长度保存到 *vlen 中。
+		int zipmapExists(unsigned char *zm, unsigned char *key, unsigned int klen);//如果给定 key 存在于 zipmap 中，那么返回 1 ，不存在则返回 0
+		unsigned int zipmapLen(unsigned char *zm);//返回 zipmap 中包含的节点数
+		size_t zipmapBlobLen(unsigned char *zm);//返回整个 zipmap 占用的字节大小
+		void zipmapRepr(unsigned char *p);//打印p开头的kye-value对
+		------------------------------------	
 	sha1.o 
+		------------------------------------
+		void SHA1Transform(u_int32_t state[5], const unsigned char buffer[64]);//该函数的功能就是进行运算，得出160位的消息摘要（message digest）并储存在context-state[ ]中，它是整个SHA-1算法的核心.
+		void SHA1Init(SHA1_CTX* context);//初始化这5个字的缓冲区
+		void SHA1Update(SHA1_CTX* context, const unsigned char* data, u_int32_t len);//完成的数据填充（附加）操作
+		void SHA1Final(unsigned char digest[20], SHA1_CTX* context);//整个算法的入口与出口。该函数通过调用该文件内其他函数完成了SHA-1算法的整个流程。
+		------------------------------------
 	ziplist.o 跳跃表实现
-	release.o 
-	networking.o 
-	util.o 
-	object.o 
-	db.o 
-	replication.o 
-	rdb.o 
-	t_string.o 
-	t_list.o 
+		------------------------------------
+		unsigned char *ziplistNew(void);//创建并返回一个新的 ziplist
+		unsigned char *ziplistPush(unsigned char *zl, unsigned char *s, unsigned int slen, int where);//将长度为 slen 的字符串 s 推入到 zl 中。
+		unsigned char *ziplistIndex(unsigned char *zl, int index);//根据给定索引，遍历列表，并返回索引指定节点的指针。
+		unsigned char *ziplistNext(unsigned char *zl, unsigned char *p);//返回 p 所指向节点的后置节点。如果 p 为表末端，或者 p 已经是表尾节点，那么返回 NULL 。
+		unsigned char *ziplistPrev(unsigned char *zl, unsigned char *p);//返回 p 所指向节点的前置节点。如果 p 所指向为空列表，或者 p 已经指向表头节点，那么返回 NULL 。
+		unsigned int ziplistGet(unsigned char *p, unsigned char **sval, unsigned int *slen, long long *lval);//取出 p 所指向节点的值
+		unsigned char *ziplistInsert(unsigned char *zl, unsigned char *p, unsigned char *s, unsigned int slen);//将包含给定值 s 的新节点插入到给定的位置 p 中。如果 p 指向一个节点，那么新节点将放在原有节点的前面。
+		unsigned char *ziplistDelete(unsigned char *zl, unsigned char **p);//从 zl 中删除 *p 所指向的节点，并且原地更新 *p 所指向的位置，使得可以在迭代列表的过程中对节点进行删除。
+		unsigned char *ziplistDeleteRange(unsigned char *zl, unsigned int index, unsigned int num);//从 index 索引指定的节点开始，连续地从 zl 中删除 num 个节点。
+		unsigned int ziplistCompare(unsigned char *p, unsigned char *s, unsigned int slen);//将 p 所指向的节点的值和 sstr 进行对比。
+		unsigned char *ziplistFind(unsigned char *p, unsigned char *vstr, unsigned int vlen, unsigned int skip);//寻找节点值和 vstr 相等的列表节点，并返回该节点的指针。每次比对之前都跳过 skip 个节点。
+		unsigned int ziplistLen(unsigned char *zl);//返回 ziplist 中的节点个数
+		size_t ziplistBlobLen(unsigned char *zl);//返回整个 ziplist 占用的内存字节数
+		------------------------------------
+	release.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	networking.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	util.o
+		------------------------------------
+		int stringmatchlen(const char *p, int plen, const char *s, int slen, int nocase);//支持glob-style的通配符格式
+		int stringmatch(const char *p, const char *s, int nocase);
+		long long memtoll(const char *p, int *err);//将表示内存数量的字符串转换成数字*字节
+		int ll2string(char *s, size_t len, long long value);//将长时间转换成字符串。返回的数量需要代表数字的字符，如果通过，可以更短缓冲区长度不足以存储整个数字。
+		int string2ll(const char *s, size_t slen, long long *value);//将一个字符串转换成很长的时间。如果字符串可以被解析，则返回1进入(非溢出)的长，否则为0。该值将被设置为适当时的解析值。
+		int string2l(const char *s, size_t slen, long *value);//将一个字符串转换成long。如果字符串可以被解析为(非溢出)long，否则为0。该值将被设置为解析在适当的价值。
+		int d2string(char *buf, size_t len, double value);//将double转换为字符串表示形式。返回所需的字节数。这个表示法应该始终可以用stdtod(3)来表示。
+		sds getAbsolutePath(char *filename);//给定文件名，将绝对路径作为SDS字符串返回，如果由于某种原因失败，则返回NULL。
+		int pathIsBaseName(char *path);//检查在指定路径中是否存在/或字符。
+		------------------------------------	
+	object.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	db.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	replication.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	rdb.o
+		------------------------------------
+		int rdbSaveType(rio *rdb, unsigned char type);//将长度为 1 字节的字符 type 写入到 rdb 文件中。
+		int rdbLoadType(rio *rdb);//从 rdb 中载入 1 字节长的 type 数据。
+		int rdbSaveTime(rio *rdb, time_t t);//??????
+		time_t rdbLoadTime(rio *rdb);//载入以秒为单位的过期时间，长度为 4 字节
+		int rdbSaveLen(rio *rdb, uint32_t len);//对 len 进行特殊编码之后写入到 rdb 。
+		uint32_t rdbLoadLen(rio *rdb, int *isencoded);//读入一个被编码的长度值。
+		int rdbSaveObjectType(rio *rdb, robj *o);//将对象 o 的类型写入到 rdb 中
+		int rdbLoadObjectType(rio *rdb);//加载一个RDB格式的类型，但如果类型不是一个有效的对象类型，则返回- 1。
+		int rdbLoad(char *filename);//将给定 rdb 中保存的数据载入到数据库中。
+		int rdbSaveBackground(char *filename);//????
+		void rdbRemoveTempFile(pid_t childpid);//移除 BGSAVE 所产生的临时文件
+		int rdbSave(char *filename);//将数据库保存到磁盘上。
+		int rdbSaveObject(rio *rdb, robj *o);//将给定对象 o 保存到 rdb 中。
+		off_t rdbSavedObjectLen(robj *o);//???????
+		off_t rdbSavedObjectPages(robj *o);//???????
+		robj *rdbLoadObject(int type, rio *rdb);//???????
+		void backgroundSaveDoneHandler(int exitcode, int bysignal);//处理 BGSAVE 完成时发送的信号
+		int rdbSaveKeyValuePair(rio *rdb, robj *key, robj *val, long long expiretime, long long now);//成功保存返回 1 ，当键已经过期时，返回 0 。
+		robj *rdbLoadStringObject(rio *rdb);//???????
+		------------------------------------	
+	t_string.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	t_list.o
+		------------------------------------
+		pending...
+		------------------------------------	
 	t_set.o 
-	t_zset.o 
-	t_hash.o 
-	config.o 
-	aof.o 
-	pubsub.o 
-	multi.o 
-	debug.o 
-	sort.o 
-	intset.o 
-	syncio.o 
-	cluster.o 
-	crc16.o 
-	endianconv.o 
-	slowlog.o 
-	scripting.o 
-	bio.o rio.o 
-	rand.o 
-	memtest.o 
-	crc64.o 
-	bitops.o 
-	sentinel.o 
-	notify.o 
-	setproctitle.o 
-	blocked.o 
+		------------------------------------
+		pending...
+		------------------------------------
+	t_zset.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	t_hash.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	config.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	aof.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	pubsub.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	multi.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	debug.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	sort.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	intset.o
+		------------------------------------
+		intset *intsetNew(void);//创建并返回一个新的空整数集合
+		intset *intsetAdd(intset *is, int64_t value, uint8_t *success);//尝试将元素 value 添加到整数集合中。
+		intset *intsetRemove(intset *is, int64_t value, int *success);//从整数集合中删除值 value 。
+		uint8_t intsetFind(intset *is, int64_t value);//检查给定值 value 是否集合中的元素。
+		int64_t intsetRandom(intset *is);//从整数集合中随机返回一个元素,只能在集合非空时使用
+		uint8_t intsetGet(intset *is, uint32_t pos, int64_t *value);//取出集合底层数组指定位置中的值，并将它保存到 value 指针中。
+		uint32_t intsetLen(intset *is);//返回整数集合现有的元素个数
+		size_t intsetBlobLen(intset *is);//返回整数集合现在占用的字节总数量,这个数量包括整数集合的结构大小，以及整数集合所有元素的总大小
+		------------------------------------	
+	syncio.o		
+		------------------------------------
+		pending...
+		------------------------------------ 
+	cluster.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	crc16.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	endianconv.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	slowlog.o
+		------------------------------------
+		void slowlogInit(void);//初始化服务器慢查询功能。
+		void slowlogPushEntryIfNeeded(robj **argv, int argc, long long duration);//根据服务器设置的最大日志长度，可能会对日志进行截断（trim）
+		void slowlogCommand(redisClient *c);//SLOWLOG 命令的实现，支持 GET / RESET 和 LEN 参数
+		------------------------------------	
+	scripting.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	bio.o
+		------------------------------------
+		void bioInit(void);//初始化后台任务系统，生成线程
+		void bioCreateBackgroundJob(int type, void *arg1, void *arg2, void *arg3);//创建后台任务
+		unsigned long long bioPendingJobsOfType(int type);//返回等待中的 type 类型的工作的数量
+		void bioWaitPendingJobsLE(int type, unsigned long long num);//返回type类型的job正在等待被执行的个数(接口不再使用)
+		time_t bioOlderJobOfType(int type);//接口不再使用???
+		void bioKillThreads(void);//杀死后台所有线程
+		------------------------------------	
+	rio.o
+		------------------------------------
+		void rioInitWithFile(rio *r, FILE *fp);//初始化文件流
+		void rioInitWithBuffer(rio *r, sds s);//初始化内存流
+		size_t rioWriteBulkCount(rio *r, char prefix, int count);//以带 '\r\n' 后缀的形式写入字符串表示的 count 到 RIO成功返回写入的数量，失败返回 0.
+		size_t rioWriteBulkString(rio *r, const char *buf, size_t len);//以 "$<count>\r\n<payload>\r\n" 的形式写入二进制安全字符
+		size_t rioWriteBulkLongLong(rio *r, long long l);//以 "$<count>\r\n<payload>\r\n" 的格式写入 long long 值
+		size_t rioWriteBulkDouble(rio *r, double d);//以 "$<count>\r\n<payload>\r\n" 的格式写入 double 值
+		void rioGenericUpdateChecksum(rio *r, const void *buf, size_t len);//通用校验和计算函数
+		void rioSetAutoSync(rio *r, off_t bytes);//通过显示地、间隔性地调用 fsync ，可以将写入的 I/O 压力分担到多次 fsync 调用中。
+		------------------------------------	
+	rand.o
+		------------------------------------
+		void redisSrand48(int32_t seedval);//设置随机数种子
+		------------------------------------	
+	memtest.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	crc64.o
+		------------------------------------
+		uint64_t crc64(uint64_t crc, const unsigned char *s, uint64_t l);
+		------------------------------------	
+	bitops.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	sentinel.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	notify.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	setproctitle.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	blocked.o
+		------------------------------------
+		pending...
+		------------------------------------	
 	hyperloglog.o
+		------------------------------------
+		pending...
+		------------------------------------
 ------------------------------------------
 Client:
-	anet.o 
+	anet.o
+		------------------------------------
+		pending...
+		------------------------------------	
 	sds.o 动态字符串实现
+		------------------------------------
+		sds sdsnewlen(const void *init, size_t initlen);//创建一个指定长度的sds，接受一个指定的C字符串作为初始化值
+		sds sdsnew(const char *init);//根据给定的C字符串，创建一个相应的sds
+		sds sdsempty(void);//创建一个只包含空字符串””的sds
+		size_t sdslen(const sds s);//返回 sds 实际保存的字符串的长度
+		sds sdsdup(const sds s);//复制给定的sds
+		void sdsfree(sds s);//释放给定的sds
+		size_t sdsavail(const sds s);//返回 sds 可用空间的长度
+		sds sdsgrowzero(sds s, size_t len);//将给定的sds扩展到指定的长度，空余的部分用\0进行填充
+		sds sdscatlen(sds s, const void *t, size_t len);//将一个C字符串追加到给定的sds对应sdshdr的buf
+		sds sdscat(sds s, const char *t);//将给定字符串 t 追加到 sds 的末尾
+		sds sdscatsds(sds s, const sds t);//将另一个 sds 追加到一个 sds 的末尾
+		sds sdscpylen(sds s, const char *t, size_t len);//将一个C字符串复制到sds中，需要依据sds的总长度来判断是否需要扩展
+		sds sdscpy(sds s, const char *t);//将字符串复制到 sds 当中，覆盖原有的字符。
+		sds sdscatvprintf(sds s, const char *fmt, va_list ap);//打印函数，被 sdscatprintf 所调用
+		#ifdef __GNUC__
+		sds sdscatprintf(sds s, const char *fmt, ...)//通过格式化输出形式，来追加到给定的sds
+			__attribute__((format(printf, 2, 3)));
+		#else
+		sds sdscatprintf(sds s, const char *fmt, ...);
+		#endif
+		sds sdscatfmt(sds s, char const *fmt, ...);//sdscatprintf性能优化版本
+		sds sdstrim(sds s, const char *cset);//对给定sds，删除前端/后端在给定的C字符串中的字符
+		void sdsrange(sds s, int start, int end);//截取给定sds，[start,end]字符串
+		void sdsupdatelen(sds s);//更新sds字符串内部状态数据(字符长度，剩余空间)
+		void sdsclear(sds s);//清除给定sds的buf，将buf初始化为””，同时修改对应sdshdr的free与len值
+		int sdscmp(const sds s1, const sds s2);//比较两个sds的大小
+		sds *sdssplitlen(const char *s, int len, const char *sep, int seplen, int *count);//对给定的字符串s按照给定的sep分隔字符串来进行切割
+		void sdsfreesplitres(sds *tokens, int count);//释放sdssplitlen，sdssplitargs分割出来的sds字符串数组
+		void sdstolower(sds s);//sds字符串变更全小写
+		void sdstoupper(sds s);//sds字符串变更全大写
+		sds sdsfromlonglong(long long value);//将value转换为sds字符串
+		sds sdscatrepr(sds s, const char *p, size_t len);//将p指向的字符串转换为人可阅读的追加到sds后面
+		sds *sdssplitargs(const char *line, int *argc);//参数分割函数，返回arc大小的sds字符串数组
+		sds sdsmapchars(sds s, const char *from, const char *to, size_t setlen);//sds字符串内按照[from, to]的字符map映射进行转换
+		sds sdsjoin(char **argv, int argc, char *sep);//将字符串用分隔符连接(sep)，返回sds字符串
+		sds sdsMakeRoomFor(sds s, size_t addlen);//对给定sds对应sdshdr的buf进行扩展
+		void sdsIncrLen(sds s, int incr);//对给定sds的buf的右端进行扩展或缩小
+		sds sdsRemoveFreeSpace(sds s);//在不改动sds的前提下，将buf的多余空间释放
+		size_t sdsAllocSize(sds s);//计算给定的sds所占的内存大小
+		------------------------------------
 	adlist.o 双端链表实现
+		------------------------------------
+		pending...
+		------------------------------------
 	redis-cli.o
+		------------------------------------
 		cliInitHelp()初始化/解析命令
 			helpEntries获取值
 		parseOptions()User 处理命令，调用对应的函数
@@ -95,26 +447,88 @@ Client:
 		sdsfreesplitres()  释放参数向量
 		noninteractive()
 			cliSendCommand()
-	zmalloc.o 
-	release.o 
-	anet.o 
-	ae.o 
+	zmalloc.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	release.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	ae.o
+		------------------------------------
+		aeEventLoop *aeCreateEventLoop(int setsize);//初始化事件处理器状态
+		void aeDeleteEventLoop(aeEventLoop *eventLoop);//删除事件处理器
+		void aeStop(aeEventLoop *eventLoop);//停止事件处理器
+		int aeCreateFileEvent(aeEventLoop *eventLoop, int fd, int mask,aeFileProc *proc, void *clientData);//根据 mask 参数的值，监听 fd 文件的状态，当 fd 可用时，执行 proc 函数	
+		void aeDeleteFileEvent(aeEventLoop *eventLoop, int fd, int mask);//将 fd 从 mask 指定的监听队列中删除
+		int aeGetFileEvents(aeEventLoop *eventLoop, int fd);//获取给定 fd 正在监听的事件类型
+		long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,aeTimeProc *proc, void *clientData,aeEventFinalizerProc *finalizerProc);//创建时间事件		
+		int aeDeleteTimeEvent(aeEventLoop *eventLoop, long long id);//删除给定 id 的时间事件
+		int aeProcessEvents(aeEventLoop *eventLoop, int flags);//处理所有已到达的时间事件，以及所有已就绪的文件事件。
+		int aeWait(int fd, int mask, long long milliseconds);//在给定毫秒内等待，直到 fd 变成可写、可读或异常
+		void aeMain(aeEventLoop *eventLoop);//事件处理器的主循环
+		char *aeGetApiName(void);//返回所使用的多路复用库的名称
+		void aeSetBeforeSleepProc(aeEventLoop *eventLoop, aeBeforeSleepProc *beforesleep);//设置处理事件前需要被执行的函数
+		int aeGetSetSize(aeEventLoop *eventLoop);//返回当前事件槽大小
+		int aeResizeSetSize(aeEventLoop *eventLoop, int setsize);//调整事件槽的大小
+		------------------------------------	
 	crc64.o
+		------------------------------------
+		uint64_t crc64(uint64_t crc, const unsigned char *s, uint64_t l);
+		------------------------------------
 -------------------------------------------
 redis-benchmark
-	ae.o 
-	anet.o 
-	redis-benchmark.o 
-	sds.o 动态字符串实现
-	adlist.o 双端链表实现
-	zmalloc.o 
+	ae.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	anet.o
+		------------------------------------
+		pending...
+		------------------------------------	
 	redis-benchmark.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	sds.o 动态字符串实现
+		------------------------------------
+		pending...
+		------------------------------------
+	adlist.o 双端链表实现
+		------------------------------------
+		pending...
+		------------------------------------
+	zmalloc.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	redis-benchmark.o
+		------------------------------------
+		pending...
+		------------------------------------
 -------------------------------------------
 redis-check-dump
-	redis-check-dump.o 
-	lzf_c.o 
-	lzf_d.o 
+	redis-check-dump.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	lzf_c.o
+		------------------------------------
+		pending...
+		------------------------------------	
+	lzf_d.o
+		------------------------------------
+		pending...
+		------------------------------------	
 	crc64.o
+		------------------------------------
+		pending...
+		------------------------------------
 -------------------------------------------
 redis-check-aof
 	redis-check-aof.o
+		------------------------------------
+		pending...
+		------------------------------------
+-------------------------------------------
