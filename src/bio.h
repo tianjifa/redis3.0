@@ -32,7 +32,7 @@ void bioInit(void);//初始化后台任务系统，生成线程
 void bioCreateBackgroundJob(int type, void *arg1, void *arg2, void *arg3);//创建后台任务
 unsigned long long bioPendingJobsOfType(int type);//返回等待中的 type 类型的工作的数量
 void bioWaitPendingJobsLE(int type, unsigned long long num);//返回type类型的job正在等待被执行的个数(接口不再使用)
-time_t bioOlderJobOfType(int type);//接口不再使用//
+time_t bioOlderJobOfType(int type);//接口不再使用???
 void bioKillThreads(void);//杀死后台所有线程
 
 /* Background job opcodes */
