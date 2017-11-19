@@ -511,24 +511,55 @@ redis-benchmark 性能测试工具
 redis-check-dump 文件检查工具
 	redis-check-dump.c
 		------------------------------------
-		pending...
+		int main(int argc, char **argv) //主函数
+			void process()
+				int processHeader()
+				entry loadEntry()
+					int loadType(entry *e)
+						int checkType(unsigned char t)  //Return true if 't' is a valid object type.
+					int peekType()
+						int checkType(unsigned char t)  //Return true if 't' is a valid object type.
+					int loadPair(entry *e)		
+						int processDoubleValue(double** store) 	
+							double* loadDoubleValue()	
+						int processStringObject(char** store)		
+							char* loadStringObject() //returns NULL when not processable, char* when valid	
+								char *loadIntegerObject(int enctype)
+								char* loadLzfStringObject()	
+									uint32_t loadLength(int *isencoded)	
+								char* loadLzfStringObject()
+					int processTime(int type)	//discard time, just consume the bytes 
+				void printValid(uint64_t ops, uint64_t bytes)
+					void printCentered(int indent, int width, char* body)	
+				void printSkipped(uint64_t bytes, uint64_t offset)	
+					void printCentered(int indent, int width, char* body)
+				void printErrorStack(entry *e)	
+					void printCentered(int indent, int width, char* body)
+				int processTime(int type)	//discard time, just consume the bytes 
 		------------------------------------	
 	lzf_c.c
 		------------------------------------
-		pending...
 		------------------------------------	
 	lzf_d.c
 		------------------------------------
-		pending...
+		lzf_decompress (const void *const in_data,  unsigned int in_len, void *out_data, unsigned int out_len)
 		------------------------------------	
-	crc64.c
+	crc64.c //循环冗余校验
 		------------------------------------
-		pending...
+		int main(void) ) //主函数
+			uint64_t crc64(uint64_t crc, const unsigned char *s, uint64_t l)
+				static const uint64_t crc64_tab[256]
 		------------------------------------
 -------------------------------------------
 redis-check-aof 文件修复工具
 	redis-check-aof.c
 		------------------------------------
-		pending...
+		int main(int argc, char **argv) //主函数
+			off_t process(FILE *fp) //返回一个偏移量(文件的末尾/文件首次出现读入错误的地方/文件第一个没有 EXEC 匹配的 MULTI 的位置)
+				int readArgc(FILE *fp, long *target) //读取参数数量
+					int readLong(FILE *fp, char prefix, long *target) //从 fp 中读入一个以 prefix 为前缀的 long 值，并将它保存到 *target 中。
+				int readString(FILE *fp, char** target) //读取字符串
+					int readLong(FILE *fp, char prefix, long *target) //从 fp 中读入一个以 prefix 为前缀的 long 值，并将它保存到 *target 中。
+					int readBytes(FILE *fp, char *target, long length) //从 fp 中读取指定的字节，并将值保存到 *target 中。
 		------------------------------------
 -------------------------------------------
